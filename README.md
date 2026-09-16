@@ -6,14 +6,14 @@
 
 从好看的监控首页，逐步成长为好用、可配置、适合长期运行的 Komari 主题。
 
-![Version](https://img.shields.io/github/v/release/sanrokamlan-prog/komari-theme-Glassmorphism?style=for-the-badge&label=release&color=10b981)
+![Version](https://img.shields.io/github/v/release/towersip/komari-theme-Glassmorphism?style=for-the-badge&label=release&color=10b981)
 ![Vue](https://img.shields.io/badge/Vue-3-42b883?style=for-the-badge&logo=vue.js)
 ![Vite](https://img.shields.io/badge/Vite-7-646cff?style=for-the-badge&logo=vite)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-v4-38bdf8?style=for-the-badge&logo=tailwindcss)
 ![Bun](https://img.shields.io/badge/Bun-%3E%3D1.2-000000?style=for-the-badge&logo=bun)
 ![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)
 
-**[📥 下载 Release](https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism/releases)** ·
+**[📥 下载 Release](https://github.com/towersip/komari-theme-Glassmorphism/releases)** ·
 **[🚀 安装](#-安装--升级)** ·
 **[✨ 功能](#-节点详情页全面升级)** ·
 **[⚙️ 设置](#️-主题设置)** ·
@@ -37,7 +37,7 @@
 
 | 项目     | 说明                                                      |
 | :------- | :-------------------------------------------------------- |
-| 当前版本 | **v3.3.7**                                                |
+| 当前版本 | **v3.3.10**                                               |
 | 主题定位 | Komari Monitor 可导入 zip 主题，不是普通 Web App 部署包   |
 | 视觉风格 | 毛玻璃卡片、动态背景、浅色 / 深色 / 北京时间自动日夜模式  |
 | 数据能力 | Metric Store 优先，旧接口自动 fallback，兼容 Komari 1.2.x |
@@ -45,6 +45,33 @@
 | 发布产物 | `komari-theme-Glassmorphism-build-<short-sha>.zip`        |
 
 > 好看只是外壳。v3 真正的重点，是把 Metric、Ping、流量、费用、健康分析和运维工具整合成日常真的会打开来看的监控面板。
+
+---
+
+## 🧹 v3.3.10 管理端空白与 404 修复
+
+- 后台入口改为 Komari 1.5 的有效路由 `/admin/dashboard`，绕过裸 `/admin` 返回 404 的问题
+- 增加无缓存的兼容 Service Worker，接管并替换旧 PWA Worker，清理 Workbox/Komari 旧缓存
+- 兼容 Worker 仅把 `/admin`、`/admin/` 导向 `/admin/dashboard`，不缓存页面或静态资源
+- 私有站点登录跳转同步使用 `/admin/dashboard`
+
+---
+
+## 🧭 v3.3.9 新版管理端路由修复
+
+- 移除把 `/admin`、`/terminal`、`/manage/*` 跳转到主题内旧 `admin-app` 的入口桥接
+- 安装包不再携带 7 月构建的旧管理端，后台和终端完全交由 Komari 1.5 内置前端处理
+- 移除指向旧管理端的 PWA manifest，避免旧入口继续被浏览器或安装应用使用
+- 后台按钮当时仍访问 `/admin`；Komari 1.5.0-fix1 的裸路径兼容问题已在 v3.3.10 修复
+
+---
+
+## 🎮 v3.3.8 Komari 1.5 GPU 兼容更新
+
+- 兼容 Komari 1.5 实时状态中的嵌套 GPU `average_usage` 与逐设备数据
+- 首页总览、节点卡片和详情页统一使用同一套 GPU 使用率归一化逻辑
+- GPU 显存由已用字节与总量换算为百分比，不再把字节数误当百分比
+- 保留旧版数值型 GPU 字段兼容，并纳入最新主分支的 GPU 修复
 
 ---
 
@@ -139,11 +166,11 @@
 
 ---
 
-## 🧩 v3.1.9 上游核心兼容与后台整合
+## 🧩 v3.1.9 上游核心兼容与后台整合（历史）
 
 - 内嵌管理端切回官方 `komari-web` `radix` 分支，不再依赖未合并的 Komari #604 / komari-web #82 计费字段
 - 新增主题内“按量费用估算器”：按节点本地保存流量单价、手工小时、一次性附加费与计价币种，明确使用探针累计流量快照和 `1 TiB = 1024⁴ bytes`
-- `/admin`、`/terminal`、`/manage/*` 保留完整官方功能，并修复子路径部署下旗帜与系统图标破图、主题管理 404 和后台样式缓存
+- 当时曾内嵌旧版管理端处理 `/admin`、`/terminal`、`/manage/*`；该兼容桥接已在 v3.3.9 随 Komari 1.5 升级移除
 - 后台毛玻璃样式加强，但将高成本模糊限制在导航、侧栏、表格和弹窗，避免密集节点页 GPU/CPU 开销放大
 - 首页高级工具改为右上角按需显示；快捷控制移除月成本；管理员访客卡改为“尊敬的管理员”，窄屏仅保留底部 IP 条
 - 支持持久背景路径 `local:文件名`，文件放在核心数据目录 `data/theme/user-assets/`，更新主题不会删除
@@ -456,12 +483,12 @@ API / RPC
 Komari 后台支持直接填写仓库地址并拉取最新 Release：
 
 ```text
-https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism
+https://github.com/towersip/komari-theme-Glassmorphism
 ```
 
 ### 方式二：手动安装 Release
 
-1. 打开 [Releases](https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism/releases)
+1. 打开 [Releases](https://github.com/towersip/komari-theme-Glassmorphism/releases)
 2. 下载最新的 `komari-theme-Glassmorphism-build-*.zip`
 3. 登录 Komari Monitor 后台，进入 **设置 → 主题管理**
 4. 上传 zip 并启用主题
@@ -512,6 +539,36 @@ dist/
 ## 📝 更新日志
 
 <details open>
+<summary><strong>v3.3.10 · 管理端空白与 404 修复</strong></summary>
+
+- 后台与私有站点登录入口改为 `/admin/dashboard`
+- 用无缓存兼容 Worker 替换旧 PWA Worker，并清理旧 Workbox/Komari 缓存
+- 裸 `/admin` 导向官方内置后台的 `/admin/dashboard`
+- 继续排除旧 `admin-app`，不重新内嵌过期管理端
+
+</details>
+
+<details>
+<summary><strong>v3.3.9 · 新版管理端路由修复</strong></summary>
+
+- 后台、终端和管理路由不再跳转主题内旧 `admin-app`
+- Release 包不再包含旧管理端文件
+- 移除旧管理端 PWA manifest 引用
+- `/admin` 完全交由当前 Komari 内置管理端处理
+
+</details>
+
+<details>
+<summary><strong>v3.3.8 · Komari 1.5 GPU 兼容更新</strong></summary>
+
+- 兼容嵌套 `average_usage`、逐设备利用率与显存字段
+- 首页、详情和历史图表统一 GPU 数据解析
+- 修复 GPU 显存字节值被当作百分比显示的问题
+- 保留旧版后端数值字段回退
+
+</details>
+
+<details>
 <summary><strong>v3.3.6 · 平铺地图总览卡片修复</strong></summary>
 
 - 平铺地图不再覆盖用户选择的首页总览卡片方案
@@ -695,7 +752,7 @@ dist/
 
 </details>
 
-更多历史版本请查看 [Releases](https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism/releases)。
+更多历史版本请查看 [Releases](https://github.com/towersip/komari-theme-Glassmorphism/releases)。
 
 ---
 

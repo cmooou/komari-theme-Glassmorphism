@@ -101,7 +101,13 @@ function komariThemeZip(): Plugin {
           }
         }
 
-        archive.directory(distDir, 'dist')
+        // Komari 1.5+ always serves /admin and /terminal from its built-in
+        // frontend. Do not ship the legacy embedded admin bridge: otherwise
+        // direct /admin-app access or stale links can reopen the old console.
+        archive.glob('**/*', {
+          cwd: distDir,
+          ignore: ['admin-app/**'],
+        }, { prefix: 'dist' })
 
         archive.finalize()
       })

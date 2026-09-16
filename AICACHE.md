@@ -12,6 +12,34 @@
 
 ## 当前任务
 
+- 状态：done，Komari 1.5.0-fix1 管理端空白与裸 `/admin` 404 兼容包已交付。
+- 目标：保留 Komari 1.5 内置管理端，同时消除旧根作用域 PWA Worker 的导航回退与缓存影响。
+- 现场证据：`https://lileyi.de/api/version` 为 `1.5.0-fix1`；`/admin` 返回 404，而 `/admin/dashboard`、`/admin/settings/site` 与 `/admin/index.html` 均返回内置管理端。
+- 参考：Tokinx/komari-theme-emerald#44 记录 1.5.0/fix1 激活 `sw.js` 后 `/admin` 白屏，注销或绕过 Worker 可恢复。
+- 实现：主题后台入口和私有站点跳转改为 `/admin/dashboard`；新增无缓存兼容 Worker，替换旧 Worker、删除 Workbox/Precache/Komari 缓存，并将裸 `/admin` 导向 `/admin/dashboard`；继续从 ZIP 排除旧 `admin-app`。
+- 版本：3.3.10。
+- 验证：Bun 1.3.14 下 lint、type-check/build、`git diff --check` 通过；Playwright Edge 16/16 通过，其中包含 Worker 实际接管、裸 `/admin` 跳转与旧缓存清理断言。
+- Fork 本地构建产物：`komari-theme-Glassmorphism-build-06999d5.zip`，5,153,232 bytes，SHA-256 `1D6538BDC870F23391D23122312DE98230A463FD063783DCDB8050B0F0E0A3E0`。
+- 包检查：353 个 entries；包含无缓存 `dist/sw.js`；无 `dist/admin-app/**`；后台入口与 Worker 均指向 `/admin/dashboard`；服务端标题/描述占位符完整。
+- Fork 发布：主题清单与 README 的仓库/Release 地址已切换到 `towersip/komari-theme-Glassmorphism`，保留原作者署名。
+
+- 状态：done，v3.3.9 新版管理端路由修复包已交付，后由 v3.3.10 继续修复裸 `/admin` 与旧 Worker 兼容问题。
+- 目标：移除主题对 `/admin`、`/terminal`、`/manage/*` 的旧 `admin-app` 跳转和打包内容，交还 Komari 1.5 内置前端。
+- 根因：主题 `index.html` 主动把官方管理路由替换到 `/admin-app/index.html`，而该目录来自 2026-07-16 的旧 komari-web 构建。
+- 实现：移除入口跳转和旧 PWA manifest；ZIP 打包忽略 `dist/admin-app/**`；版本升级为 3.3.9。
+- 验证：Bun 1.3.14 下 lint、type-check/build、`git diff --check` 通过；Playwright Edge 15/15 通过。
+- 产物：`komari-theme-Glassmorphism-v3.3.9-komari1.5.zip`，5,152,477 bytes，SHA-256 `6C6FCA2D136525A1DBB70A74FCF4B834A6DBDAAC7695DC56356EE591F2C03ABD`。
+
+- 状态：done，本地 Komari 1.5 兼容包已交付
+- 目标：以最新 `main` 为基础，将 v3.3.7 之后尚未发布的 GPU 数据结构兼容修复打包为 v3.3.8 可安装主题。
+- 里程碑：M6 发布/验证；运行时适配来自现有主分支提交，不扩大功能范围。
+- 官方核对：Komari 1.5.0-fix1 强制由内置主题接管 `/admin`、`/terminal`，并在服务端处理第三方主题 PWA 冲突；Glassmorphism 无需再新增管理端路由覆盖。
+- 范围：版本与 README、lint/type-check/build、视觉回归、ZIP 根目录/占位符/校验和验证。
+- 不做：不推送仓库、不创建 GitHub Release、不修改 Komari 后端。
+- 验证：Bun 1.3.14 下 `bun run lint`、`bun run build`、`git diff --check` 通过；Playwright Edge 15/15 场景通过；`bun audit --production` 无漏洞。
+- 产物：`komari-theme-Glassmorphism-v3.3.8-komari1.5.zip`，7,595,607 bytes，SHA-256 `9FE3D8F073B65577D8B10FF400483A0D793CB0B81B75160466C1C280EDDE3DFE`。
+- 包检查：771 个 entries；根目录包含 `komari-theme.json`、`preview.png`、`dist/`；版本 3.3.8；无 Service Worker、无不安全路径；HTML 服务端替换占位符完整。
+
 - 状态：in-progress，本地修复与验证完成，正在发布 v3.3.5
 - 目标：修复详情页延迟任务卡片、图例和主页 Ping 指标线与 Komari 后台任务排序不一致的问题。
 - 里程碑：M4 UI/UX 兼容性修复，不修改后端任务权重或接口契约。
