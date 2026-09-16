@@ -102,6 +102,41 @@ test('home mini card metric icons remain accessible', async ({ page }) => {
   await expect(card.getByRole('img', { name: '内存' })).toBeVisible()
 })
 
+test('iOS standalone safe areas keep header and fixed controls reachable', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await installKomariFixture(page, { hideEarth: true })
+  await openStablePage(page)
+  await page.addStyleTag({
+    content: `
+      :root {
+        --komari-safe-area-top: 59px;
+        --komari-safe-area-right: 21px;
+        --komari-safe-area-bottom: 34px;
+        --komari-safe-area-left: 47px;
+      }
+    `,
+  })
+
+  const header = page.locator('[data-app-header]')
+  const headerContent = page.locator('[data-app-header-content]')
+  const visitorBar = page.locator('[data-visitor-compact-bar]')
+  const backTop = page.locator('[data-back-top]')
+  const footer = page.locator('[data-app-footer]')
+
+  await expect(header).toHaveCSS('padding-top', '59px')
+  await expect(headerContent).toHaveCSS('padding-left', '47px')
+  await expect(headerContent).toHaveCSS('padding-right', '21px')
+  await expect(visitorBar).toBeVisible()
+  await expect(visitorBar).toHaveCSS('bottom', '46px')
+  await expect(backTop).toHaveCSS('right', '33px')
+  await expect(backTop).toHaveCSS('bottom', '98px')
+  await expect(footer).toHaveCSS('padding-bottom', '50px')
+
+  const settingsButton = page.getByRole('button', { name: '后台管理' })
+  const settingsBox = await settingsButton.boundingBox()
+  expect(settingsBox?.y).toBeGreaterThanOrEqual(59)
+})
+
 test('node card expiry uses red through 5 days and yellow through 10 days', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 })
   await installKomariFixture(page, { expiryThresholds: true, hideEarth: true })

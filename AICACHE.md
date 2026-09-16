@@ -12,6 +12,13 @@
 
 ## 当前任务
 
+- 状态：done，Issue #55 的 iOS 主屏幕安全区修复已完成并通过本地验证，待提交推送。
+- 目标：修复 iOS 主屏幕模式中顶部设置按钮被状态栏/灵动岛遮挡且无法点击，以及底部固定控件压入 Home Indicator 的问题。
+- 根因：页面已启用 `viewport-fit=cover` 与半透明状态栏，但 sticky header、访客条和返回顶部按钮未读取 `safe-area-inset-*`。
+- 实现：新增可覆盖的 `--komari-safe-area-*` 环境变量；顶部控制栏预留上/左右安全区；访客条、访客详情、返回顶部按钮与页脚避开下/左右安全区；根页面和主内容使用 `100dvh` 并保留 `100vh` fallback。
+- 版本：3.3.11。
+- 验证：Bun 1.3.14 下 lint、type-check/build、`git diff --check` 通过；Playwright 系统 Chrome 17/17 通过，新增用例注入 59/21/34/47px 安全区并验证设置按钮和固定控件位置；既有视觉快照无差异。
+
 - 状态：done，Komari 1.5.0-fix1 管理端空白与裸 `/admin` 404 兼容包已交付。
 - 目标：保留 Komari 1.5 内置管理端，同时消除旧根作用域 PWA Worker 的导航回退与缓存影响。
 - 现场证据：`https://lileyi.de/api/version` 为 `1.5.0-fix1`；`/admin` 返回 404，而 `/admin/dashboard`、`/admin/settings/site` 与 `/admin/index.html` 均返回内置管理端。

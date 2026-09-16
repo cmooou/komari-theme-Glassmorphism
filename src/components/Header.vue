@@ -92,10 +92,11 @@ const sitename = computed(() => appStore.publicSettings?.sitename || 'Komari Mon
   <VisitorInfo v-if="!appStore.loading && appStore.visitorInfoEnabled" />
 
   <div
-    class="transition-all duration-200 top-0 sticky z-10 border-b border-transparent"
+    data-app-header
+    class="app-header transition-all duration-200 top-0 sticky z-10 border-b border-transparent"
     :class="isScrolled ? '!border-slate-500/10 backdrop-blur-lg' : 'bg-transparent'"
   >
-    <div class="px-4 flex-between h-14 max-w-[1280px] mx-auto">
+    <div data-app-header-content class="app-header-content flex-between h-14 max-w-[1280px] mx-auto">
       <div class="flex items-center gap-3 cursor-pointer" @click="router.push('/')">
         <Avatar class="size-8">
           <AvatarImage :src="siteFavicon" :alt="sitename" />
@@ -127,3 +128,14 @@ const sitename = computed(() => appStore.publicSettings?.sitename || 'Komari Mon
     </div>
   </div>
 </template>
+
+<style scoped>
+.app-header {
+  padding-top: var(--komari-safe-area-top);
+}
+
+.app-header-content {
+  padding-right: max(1rem, var(--komari-safe-area-right));
+  padding-left: max(1rem, var(--komari-safe-area-left));
+}
+</style>
