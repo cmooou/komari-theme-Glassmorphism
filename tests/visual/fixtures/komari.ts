@@ -26,6 +26,7 @@ export interface VisualFixtureOptions {
   expiryThresholds?: boolean
   missingCpuMetricHistory?: boolean
   pingTaskOrdering?: boolean
+  threeNetPing?: boolean
   generalCardKeys?: string[]
 }
 
@@ -77,7 +78,7 @@ function buildClients(freePriceNode = false, expiryThresholds = false) {
   }))
 }
 
-function buildStatuses() {
+function buildStatuses(threeNetPing = false) {
   return Object.fromEntries(Array.from({ length: 12 }, (_, index) => {
     const uuid = uuidFor(index)
     const offline = index === 5
@@ -85,6 +86,15 @@ function buildStatuses() {
     const trafficWarning = index === 6
     const memTotal = (index % 4 + 1) * GIB
     const diskTotal = (index % 3 + 1) * 40 * GIB
+    const ping = threeNetPing
+      ? {
+          1: { name: '广东省-电信', latest: offline ? -1 : 42 + index * 13, avg: 50 + index * 11, tail: 88 + index * 14, loss: offline ? 100 : 1.2 + index * 0.4, min: 32, max: 260 },
+          3: { name: '广东省-移动', latest: offline ? -1 : 58 + index * 9, avg: 66 + index * 8, tail: 102 + index * 11, loss: offline ? 100 : 2.1 + index * 0.3, min: 40, max: 280 },
+          4: { name: '广东省-联通', latest: offline ? -1 : 51 + index * 11, avg: 60 + index * 9, tail: 96 + index * 12, loss: offline ? 100 : 1.6 + index * 0.35, min: 36, max: 270 },
+        }
+      : {
+          1: { name: 'Tokyo', latest: offline ? -1 : 42 + index * 13, avg: 50 + index * 11, tail: 88 + index * 14, loss: offline ? 100 : index * 2.3, min: 32, max: 260 },
+        }
     return [uuid, {
       client: uuid,
       time: FIXED_NOW,
@@ -116,9 +126,7 @@ function buildStatuses() {
       uptime: offline ? 0 : (index + 3) * 86_400,
       message: '',
       updated_at: FIXED_NOW,
-      ping: {
-        1: { name: 'Tokyo', latest: offline ? -1 : 42 + index * 13, avg: 50 + index * 11, tail: 88 + index * 14, loss: offline ? 100 : index * 2.3, min: 32, max: 260 },
-      },
+      ping,
     }]
   }))
 }
@@ -244,7 +252,13 @@ async function handleRpc(route: Route, clientFixtures = clients, options: Visual
         { id: 10, name: '浙江联通', interval: 60, loss: 0, weight: 1 },
         { id: 20, name: '浙江电信', interval: 60, loss: 0, weight: 2 },
       ]
-    : [{ id: 1, name: 'Tokyo', interval: 60, loss: 3.2, weight: 1 }]
+    : options.threeNetPing
+      ? [
+          { id: 1, name: '广东省-电信', interval: 60, loss: 3.2, weight: 1 },
+          { id: 3, name: '广东省-移动', interval: 60, loss: 4.1, weight: 2 },
+          { id: 4, name: '广东省-联通', interval: 60, loss: 2.8, weight: 3 },
+        ]
+      : [{ id: 1, name: 'Tokyo', interval: 60, loss: 3.2, weight: 1 }]
   const metricPingTasks = options.pingTaskOrdering
     ? [pingTasks[2]!, pingTasks[0]!, pingTasks[1]!]
     : pingTasks
@@ -264,7 +278,7 @@ async function handleRpc(route: Route, clientFixtures = clients, options: Visual
       result = clientFixtures
       break
     case 'common:getNodesLatestStatus':
-      result = statuses
+      result = options.threeNetPing ? buildStatuses(true) : statuses
       break
     case 'common:getNodeRecentStatus':
       result = { count: 48, records: buildRecords(uuid) }
@@ -293,7 +307,7 @@ async function handleRpc(route: Route, clientFixtures = clients, options: Visual
       result = buildMetricResponse(payload.params ?? {}, options, pingTasks)
       break
     case 'public:getPingMetricStats':
-      result = options.pingTaskOrdering
+      result = options.pingTaskOrdering || options.threeNetPing
         ? {
             start: FIXED_NOW,
             end: FIXED_NOW,
@@ -305,8 +319,8 @@ async function handleRpc(route: Route, clientFixtures = clients, options: Visual
               interval: task.interval,
               tags: { task_id: String(task.id), task_name: task.name },
               total: 48,
-              valid: 48,
-              loss: 0,
+              valid: options.threeNetPing ? 45 : 48,
+              loss: options.threeNetPing ? 6.25 : 0,
               loss_approximate: false,
               min: 40 + task.id,
               max: 120 + task.id,
@@ -365,6 +379,12 @@ export async function installKomariFixture(page: Page, options: VisualFixtureOpt
         ? ['onlineNodes', 'remainingValue', 'monthlyCost', 'totalTraffic', 'uploadSpeed', 'downloadSpeed']
         : ['memory', 'disk', 'remainingValue', 'totalTraffic', 'uploadSpeed', 'downloadSpeed']
     )).join('\n'),
+    ...(options.threeNetPing
+      ? {
+          threeNetPingEnabled: true,
+          threeNetPingTaskIds: [1, 3, 4],
+        }
+      : {}),
   }
 
   await page.addInitScript(({ fixedNow }) => {

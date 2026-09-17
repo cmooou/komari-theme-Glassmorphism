@@ -388,19 +388,31 @@ const siteName = computed(() => appStore.privateFeaturesAllowed ? '尊敬的管�
 
 <style scoped>
 .visitor-compact-bar {
-  bottom: calc(0.75rem + var(--komari-safe-area-bottom));
-  max-width: calc(100vw - 1.5rem - var(--komari-safe-area-left) - var(--komari-safe-area-right));
+  bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+  bottom: calc(0.75rem + var(--komari-safe-area-bottom, env(safe-area-inset-bottom, 0px)));
+  max-width: calc(100vw - 1.5rem - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
+  max-width: calc(
+    100vw - 1.5rem - var(--komari-safe-area-left, env(safe-area-inset-left, 0px)) -
+      var(--komari-safe-area-right, env(safe-area-inset-right, 0px))
+  );
 }
 
 .visitor-detail-card {
-  bottom: calc(4rem + var(--komari-safe-area-bottom));
-  left: calc(0.75rem + var(--komari-safe-area-left));
-  max-width: calc(100vw - 1.5rem - var(--komari-safe-area-left) - var(--komari-safe-area-right));
+  bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
+  bottom: calc(4rem + var(--komari-safe-area-bottom, env(safe-area-inset-bottom, 0px)));
+  left: calc(0.75rem + env(safe-area-inset-left, 0px));
+  left: calc(0.75rem + var(--komari-safe-area-left, env(safe-area-inset-left, 0px)));
+  max-width: calc(100vw - 1.5rem - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
+  max-width: calc(
+    100vw - 1.5rem - var(--komari-safe-area-left, env(safe-area-inset-left, 0px)) -
+      var(--komari-safe-area-right, env(safe-area-inset-right, 0px))
+  );
 }
 
 @media (min-width: 768px) {
   .visitor-compact-bar {
-    bottom: calc(1rem + var(--komari-safe-area-bottom));
+    bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+    bottom: calc(1rem + var(--komari-safe-area-bottom, env(safe-area-inset-bottom, 0px)));
   }
 }
 

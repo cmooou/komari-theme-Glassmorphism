@@ -62,8 +62,11 @@ const formattedServerVersion = computed(() => serverVersion.value?.version ?? ''
 
 <style scoped>
 .app-footer {
-  padding-right: max(1rem, var(--komari-safe-area-right));
-  padding-bottom: calc(1rem + var(--komari-safe-area-bottom));
-  padding-left: max(1rem, var(--komari-safe-area-left));
+  padding-right: max(1rem, env(safe-area-inset-right, 0px));
+  padding-right: max(1rem, var(--komari-safe-area-right, env(safe-area-inset-right, 0px)));
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(1rem + var(--komari-safe-area-bottom, env(safe-area-inset-bottom, 0px)));
+  padding-left: max(1rem, env(safe-area-inset-left, 0px));
+  padding-left: max(1rem, var(--komari-safe-area-left, env(safe-area-inset-left, 0px)));
 }
 </style>

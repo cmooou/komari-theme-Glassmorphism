@@ -1,4 +1,4 @@
-import type { Client, NodeStatus } from '@/utils/rpc'
+import type { Client, NodeStatus, NodeStatusPing } from '@/utils/rpc'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { useAppStore } from '@/stores/app'
@@ -68,6 +68,7 @@ export interface NodeData {
   uptime: number
   message?: string
   status_updated_at?: string
+  ping?: Record<string, NodeStatusPing>
 }
 
 /** WebSocket 连接状态 */
@@ -98,6 +99,7 @@ interface StatusData {
   uptime: number
   message?: string
   updated_at?: string
+  ping?: Record<string, NodeStatusPing>
 }
 
 const useNodesStore = defineStore('nodes', () => {
@@ -220,7 +222,32 @@ const useNodesStore = defineStore('nodes', () => {
       connections: 0,
       connections_udp: 0,
       uptime: 0,
+      ping: undefined,
     }
+  }
+
+  function pingMapsEqual(
+    left: Record<string, NodeStatusPing> | undefined,
+    right: Record<string, NodeStatusPing> | undefined,
+  ): boolean {
+    if (left === right)
+      return true
+    if (!left || !right)
+      return !left && !right
+
+    const leftKeys = Object.keys(left)
+    const rightKeys = Object.keys(right)
+    if (leftKeys.length !== rightKeys.length)
+      return false
+
+    return leftKeys.every((key) => {
+      const current = left[key]
+      const next = right[key]
+      return !!current && !!next
+        && current.name === next.name
+        && current.latest === next.latest
+        && current.loss === next.loss
+    })
   }
 
   /**
@@ -279,6 +306,8 @@ const useNodesStore = defineStore('nodes', () => {
       node.message = status.message
     if (node.status_updated_at !== status.updated_at)
       node.status_updated_at = status.updated_at
+    if (!pingMapsEqual(node.ping, status.ping))
+      node.ping = status.ping
   }
 
   /**

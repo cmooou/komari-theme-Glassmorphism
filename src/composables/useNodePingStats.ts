@@ -21,17 +21,18 @@ export interface NodePingStatsState {
   hasData: boolean
 }
 
-interface PingRecord {
+export interface PingRecord {
   client: string
   task_id: number
   time: string
   value: number
 }
 
-interface MetricLossPoint {
+export interface PingMetricLossPoint {
   time: string
   value: number
   count: number
+  taskId: number
 }
 
 function normalizeMaxCount(maxCount: number | null | undefined): number | undefined {
@@ -44,7 +45,7 @@ interface SharedPingRecordsState {
   recordsByClient: Map<string, PingRecord[]>
   source: 'metric' | 'legacy'
   metricStats?: PingMetricTaskStats[]
-  metricLossPoints?: MetricLossPoint[]
+  metricLossPoints?: PingMetricLossPoint[]
 }
 
 interface SharedPingRecordsEntry {
@@ -288,7 +289,7 @@ async function loadPingMetricRecords(nodeUuid: string, hours: number, maxCount?:
     ? (statsResult.value.stats ?? []).filter(stat => stat.entity_id === nodeUuid)
     : []
   const metricRecords: PingRecord[] = []
-  const metricLossPoints: MetricLossPoint[] = []
+  const metricLossPoints: PingMetricLossPoint[] = []
   const metricLossTaskIds = new Set<number>()
 
   if (metricsResult.status === 'fulfilled') {
@@ -307,6 +308,7 @@ async function loadPingMetricRecords(nodeUuid: string, hours: number, maxCount?:
             time: point.time,
             value: point.value,
             count: isFiniteNumber(point.count) && point.count > 0 ? point.count : 1,
+            taskId,
           })
           metricLossTaskIds.add(taskId)
         }
@@ -440,7 +442,7 @@ function retainSharedPingRecordsEntry(hours: number, maxCount?: number, uuid?: s
   }
 }
 
-function buildPingHistory(records: PingRecord[], metricLossPoints?: MetricLossPoint[]): NodePingHistoryPoint[] {
+function buildPingHistory(records: PingRecord[], metricLossPoints?: PingMetricLossPoint[]): NodePingHistoryPoint[] {
   const sortedRecords = records
     .map((record) => {
       const timestamp = new Date(record.time).getTime()
@@ -542,7 +544,7 @@ function getPercentile(values: number[], percentile: number): number | null {
   return lowerValue + (upperValue - lowerValue) * (position - lowerIndex)
 }
 
-function buildStats(records: PingRecord[], metricStats?: PingMetricTaskStats[], metricLossPoints?: MetricLossPoint[]): NodePingStatsState {
+function buildStats(records: PingRecord[], metricStats?: PingMetricTaskStats[], metricLossPoints?: PingMetricLossPoint[]): NodePingStatsState {
   const statsWithSamples = (metricStats ?? []).filter(stat => stat.total > 0)
   if (statsWithSamples.length) {
     const history = buildPingHistory(records.filter(record => record.value >= 0), metricLossPoints)
@@ -630,6 +632,25 @@ function buildStats(records: PingRecord[], metricStats?: PingMetricTaskStats[], 
     history,
     hasData,
   }
+}
+
+export function buildPingStatsForTask(
+  records: readonly PingRecord[],
+  taskId: number,
+  metricStats?: readonly PingMetricTaskStats[],
+  metricLossPoints?: readonly PingMetricLossPoint[],
+): NodePingStatsState {
+  const taskRecords = records.filter(record => record.task_id === taskId)
+  const taskMetricStats = metricStats?.filter(stat => normalizeTaskId(String(stat.task_id)) === taskId)
+  const taskLossPoints = metricLossPoints?.filter(point => point.taskId === taskId)
+  if (taskLossPoints?.length) {
+    return buildStats(
+      taskRecords,
+      taskMetricStats?.length ? [...taskMetricStats] : undefined,
+      [...taskLossPoints],
+    )
+  }
+  return buildStats(taskRecords)
 }
 
 export function useNodePingStats(
@@ -762,10 +783,40 @@ export function useNodePingStats(
       persistStats(nodeUuid, hours, maxCount, value)
   })
 
+  const records = computed<PingRecord[]>(() => {
+    const { uuid: nodeUuid, hours, maxCount, enabled } = resolved.value
+    if (!enabled || !nodeUuid.trim())
+      return []
+
+    const entry = getSharedPingRecordsEntry(hours, maxCount, nodeUuid)
+    return entry.data.value?.recordsByClient.get(nodeUuid) ?? []
+  })
+
+  const metricStats = computed<PingMetricTaskStats[]>(() => {
+    const { uuid: nodeUuid, hours, maxCount, enabled } = resolved.value
+    if (!enabled || !nodeUuid.trim())
+      return []
+
+    const entry = getSharedPingRecordsEntry(hours, maxCount, nodeUuid)
+    return entry.data.value?.metricStats ?? []
+  })
+
+  const metricLossPoints = computed<PingMetricLossPoint[]>(() => {
+    const { uuid: nodeUuid, hours, maxCount, enabled } = resolved.value
+    if (!enabled || !nodeUuid.trim())
+      return []
+
+    const entry = getSharedPingRecordsEntry(hours, maxCount, nodeUuid)
+    return entry.data.value?.metricLossPoints ?? []
+  })
+
   return {
     stats,
     loading,
     error,
+    records,
+    metricStats,
+    metricLossPoints,
     history: computed(() => stats.value.history),
     avgLatency: computed(() => stats.value.avgLatency),
     avgLoss: computed(() => stats.value.avgLoss),

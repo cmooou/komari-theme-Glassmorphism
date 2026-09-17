@@ -1,11 +1,12 @@
 import type { MaybeRefOrGetter } from 'vue'
+import type { NodePingHistoryPoint } from '@/composables/useNodePingStats'
 import { computed, toValue } from 'vue'
 import { useNodePingStats } from '@/composables/useNodePingStats'
 import { PING_SUMMARY_MAX_COUNT } from '@/constants/load'
 import { useAppStore } from '@/stores/app'
 import { formatDateTime } from '@/utils/helper'
 
-export type NodePingMetric = 'latency' | 'loss'
+type NodePingMetric = 'latency' | 'loss'
 
 export interface NodePingBar {
   key: string
@@ -47,6 +48,44 @@ function getLossToneClass(loss: number): string {
   return 'bg-signal-5 ping-signal-pattern-4'
 }
 
+export function buildEmptyPingBars(tooltip: string, keyPrefix = 'latency'): NodePingBar[] {
+  return Array.from({ length: EMPTY_PING_BAR_COUNT }, (_, index) => ({
+    key: `${keyPrefix}-empty-${index}`,
+    className: 'bg-muted-foreground/10',
+    tooltip,
+  }))
+}
+
+export function buildLatencyBars(history: NodePingHistoryPoint[]): NodePingBar[] {
+  if (!history.length)
+    return []
+
+  return history.map((point, index) => ({
+    key: `${point.time}-${index}`,
+    className: point.latency === null
+      ? 'bg-muted-foreground/15'
+      : getLatencyToneClass(point.latency),
+    tooltip: point.latency === null
+      ? `${formatDateTime(point.time, 'HH:mm:ss')}\n无采样数据`
+      : `${formatDateTime(point.time, 'HH:mm:ss')}\n${Math.round(point.latency)} ms`,
+  }))
+}
+
+export function buildLossBars(history: NodePingHistoryPoint[]): NodePingBar[] {
+  if (!history.length)
+    return []
+
+  return history.map((point, index) => ({
+    key: `${point.time}-${index}`,
+    className: point.loss === null
+      ? 'bg-muted-foreground/15'
+      : getLossToneClass(point.loss),
+    tooltip: point.loss === null
+      ? `${formatDateTime(point.time, 'HH:mm:ss')}\n无采样数据`
+      : `${formatDateTime(point.time, 'HH:mm:ss')}\n${point.loss.toFixed(1)}%`,
+  }))
+}
+
 export function useNodePingDisplay(
   uuid: MaybeRefOrGetter<string>,
   options: UseNodePingDisplayOptions = {},
@@ -74,52 +113,25 @@ export function useNodePingDisplay(
     maxCount: PING_SUMMARY_MAX_COUNT,
   })
 
-  function buildPingBars(metric: NodePingMetric): NodePingBar[] {
-    const points = pingStats.history.value
-    if (!points.length)
-      return []
+  const emptyBarsTooltip = computed(() => {
+    if (pingStats.loading.value)
+      return '加载中'
+    if (pingStats.error.value)
+      return '加载失败'
+    if (!pingStatsEnabled.value)
+      return '未启用记录'
+    return '无采样数据'
+  })
 
-    return points.map((point, index) => {
-      const value = point[metric]
+  const latencyRenderBars = computed(() => {
+    const bars = buildLatencyBars(pingStats.history.value)
+    return bars.length ? bars : buildEmptyPingBars(emptyBarsTooltip.value, 'latency')
+  })
 
-      return {
-        key: `${point.time}-${index}`,
-        className: value === null
-          ? 'bg-muted-foreground/15'
-          : metric === 'latency'
-            ? getLatencyToneClass(value)
-            : getLossToneClass(value),
-        tooltip: value === null
-          ? `${formatDateTime(point.time, 'HH:mm:ss')}\n无采样数据`
-          : metric === 'latency'
-            ? `${formatDateTime(point.time, 'HH:mm:ss')}\n${Math.round(value)} ms`
-            : `${formatDateTime(point.time, 'HH:mm:ss')}\n${value.toFixed(1)}%`,
-      }
-    })
-  }
-
-  function buildEmptyPingBars(metric: NodePingMetric): NodePingBar[] {
-    const tooltip = pingStats.loading.value
-      ? '加载中'
-      : pingStats.error.value
-        ? '加载失败'
-        : !pingStatsEnabled.value
-            ? '未启用记录'
-            : metric === 'latency'
-              ? '无采样数据'
-              : '无采样数据'
-
-    return Array.from({ length: EMPTY_PING_BAR_COUNT }, (_, index) => ({
-      key: `${metric}-empty-${index}`,
-      className: 'bg-muted-foreground/10',
-      tooltip,
-    }))
-  }
-
-  const latencyBars = computed(() => buildPingBars('latency'))
-  const lossBars = computed(() => buildPingBars('loss'))
-  const latencyRenderBars = computed(() => latencyBars.value.length ? latencyBars.value : buildEmptyPingBars('latency'))
-  const lossRenderBars = computed(() => lossBars.value.length ? lossBars.value : buildEmptyPingBars('loss'))
+  const lossRenderBars = computed(() => {
+    const bars = buildLossBars(pingStats.history.value)
+    return bars.length ? bars : buildEmptyPingBars(emptyBarsTooltip.value, 'loss')
+  })
 
   const latencyDisplay = computed(() => {
     if (pingStats.hasData.value)
@@ -160,9 +172,10 @@ export function useNodePingDisplay(
   })
 
   return {
-    pingStats,
-    pingStatsEnabled,
-    pingStatsHours,
+    records: pingStats.records,
+    metricStats: pingStats.metricStats,
+    metricLossPoints: pingStats.metricLossPoints,
+    loading: pingStats.loading,
     latencyRenderBars,
     lossRenderBars,
     latencyDisplay,

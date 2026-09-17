@@ -794,6 +794,45 @@ function readStringSetting(settings: ThemeSettings, key: string, fallback = ''):
   return typeof value === 'string' ? value.trim() : fallback
 }
 
+const THREE_NET_PING_TASK_LIMIT = 3
+const PING_TASK_ID_SPLIT_RE = /[\s,;]+/
+
+function parsePingTaskIds(raw: unknown, max = THREE_NET_PING_TASK_LIMIT): number[] {
+  let items: unknown[] = []
+
+  if (Array.isArray(raw)) {
+    items = raw
+  }
+  else if (typeof raw === 'string') {
+    const trimmed = raw.trim()
+    if (!trimmed)
+      return []
+
+    try {
+      const parsed = JSON.parse(trimmed) as unknown
+      items = Array.isArray(parsed) ? parsed : trimmed.split(PING_TASK_ID_SPLIT_RE)
+    }
+    catch {
+      items = trimmed.split(PING_TASK_ID_SPLIT_RE)
+    }
+  }
+
+  const ids: number[] = []
+  const seen = new Set<number>()
+
+  for (const item of items) {
+    const id = typeof item === 'number' ? item : Number(String(item).trim())
+    if (!Number.isInteger(id) || id <= 0 || seen.has(id))
+      continue
+    seen.add(id)
+    ids.push(id)
+    if (ids.length >= max)
+      break
+  }
+
+  return ids
+}
+
 function resolveBackgroundSource(value: unknown): string {
   if (typeof value !== 'string')
     return ''
@@ -1139,6 +1178,10 @@ const useAppStore = defineStore('app', () => {
 
   const diskPredictionThresholdDays = computed<number>(() => readNumberSetting(themeSettings.value, 'diskPredictionThresholdDays', 30, 1, 3650))
 
+  const threeNetPingEnabled = computed<boolean>(() => readBooleanSetting(themeSettings.value, 'threeNetPingEnabled', false))
+
+  const threeNetPingTaskIds = computed<number[]>(() => parsePingTaskIds(themeSettings.value.threeNetPingTaskIds))
+
   const chartDashboardTemplate = computed<ChartDashboardTemplate>(() => {
     const settings = themeSettings.value
 
@@ -1342,6 +1385,8 @@ const useAppStore = defineStore('app', () => {
     homeExpiringDays,
     diskPredictionEnabled,
     diskPredictionThresholdDays,
+    threeNetPingEnabled,
+    threeNetPingTaskIds,
     chartDashboardTemplate,
     hideAdminEntryWhenLoggedOut,
     hidePriceWhenLoggedOut,

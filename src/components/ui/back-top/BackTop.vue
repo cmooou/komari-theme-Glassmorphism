@@ -58,14 +58,18 @@ onUnmounted(() => {
 
 <style scoped>
 .back-top {
-  right: calc(0.75rem + var(--komari-safe-area-right));
-  bottom: calc(4rem + var(--komari-safe-area-bottom));
+  right: calc(0.75rem + env(safe-area-inset-right, 0px));
+  right: calc(0.75rem + var(--komari-safe-area-right, env(safe-area-inset-right, 0px)));
+  bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
+  bottom: calc(4rem + var(--komari-safe-area-bottom, env(safe-area-inset-bottom, 0px)));
 }
 
 @media (min-width: 768px) {
   .back-top {
-    right: calc(2rem + var(--komari-safe-area-right));
-    bottom: calc(2rem + var(--komari-safe-area-bottom));
+    right: calc(2rem + env(safe-area-inset-right, 0px));
+    right: calc(2rem + var(--komari-safe-area-right, env(safe-area-inset-right, 0px)));
+    bottom: calc(2rem + env(safe-area-inset-bottom, 0px));
+    bottom: calc(2rem + var(--komari-safe-area-bottom, env(safe-area-inset-bottom, 0px)));
   }
 }
 </style>

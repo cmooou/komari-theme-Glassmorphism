@@ -12,6 +12,21 @@
 
 ## 当前任务
 
+- 状态：in-progress，发布 v3.3.12：提交并推送 main，由 Release On Version Bump 经 GitHub API 创建 Release。
+- 范围：三网延迟 + Issue #55 iOS 网页缩放安全区；版本保持 3.3.12。
+- 本地：Node 22 ESLint 与 `vue-tsc --build` 通过。
+- 不做：不升 3.3.13。
+
+- 状态：done，v3.3.12 code review 修复已落地：Safari aA 用 layout/visual 短边比检测缩放；三网 Metric 丢包柱按 taskId 过滤 `metricLossPoints`；顶栏改回 `z-10`；inset 带 `env()` 回退。
+- 验证：`vue-tsc --build` 与 `git diff --check` 通过；Playwright 系统 Chrome 4/4（2 个原 iOS + 缩放系数 2 + 三网替换/丢包柱）。
+- 产物：构建时覆盖了 `komari-theme-Glassmorphism-build-48d9587.zip`（仍为 3.3.12）。
+- 不做：不升版本、不提交、不发 Release，除非用户要求。
+- 三网：`threeNetPingEnabled` / `threeNetPingTaskIds`；开启后原总览延迟/丢包换成所选 1～3 个任务组。
+- 安全区：`--komari-safe-area-zoom` 用短边比补偿 Safari aA 缩放；不覆盖 `--komari-safe-area-top` 像素值。
+- 验证：`vue-tsc --build` 与 `git diff --check` 通过；Playwright 系统 Chrome 2/2 iOS 安全区用例通过（含 2× inset）。实机未测。
+- 产物：`komari-theme-Glassmorphism-build-48d9587.zip`，4.91 MB，SHA-256 `38B388435EFA9842CF6BD4A6BAEE327F8623CA25257090387BF557418DBC7C1D`；顶层 `komari-theme.json` / `preview.png` / `dist/`；版本 3.3.12；含三网设置与缩放安全区。
+- 不做：不升 3.3.13、不提交、不发 Release，除非用户要求。
+
 - 状态：done，Issue #55 的 iOS 主屏幕安全区修复已完成并通过本地验证，待提交推送。
 - 目标：修复 iOS 主屏幕模式中顶部设置按钮被状态栏/灵动岛遮挡且无法点击，以及底部固定控件压入 Home Indicator 的问题。
 - 根因：页面已启用 `viewport-fit=cover` 与半透明状态栏，但 sticky header、访客条和返回顶部按钮未读取 `safe-area-inset-*`。
@@ -99,6 +114,14 @@
 - 不做：不把 Glassmorphism 默认主题替换混入计费 PR #604；不发布测试构建为正式 Release；不构建 Windows 包。
 
 ## 执行日志
+
+### 2026-09-17 v3.3.12 节点卡片三网延迟
+
+- 用户截图指向节点卡片延迟/丢包条，要求主题配置可开关，并可选哪三个 Ping 任务。
+- 实时状态里已有 `status.ping`，键为 task_id；本机代理到 `lileyi.de` 时 CN2-GIA 可见任务 1 广东省-电信、3 广东省-移动、4 广东省-联通。
+- 配置走 Komari `pingtasks` 类型，规范化层最多保留 3 个正整数 ID；开关默认关闭，未选任务时不渲染该行。
+- 展示层把任务名缩成 电信/联通/移动/教育，最新延迟着色，`latest < 0` 显示「丢包」；点击仍打开既有 Ping 面板。
+- 浏览器：默认关闭布局未变。开发环境可用 `?threeNetPing=任务ID` 覆盖主题设置做本地预览；生产包仍只认后台主题设置。
 
 ### 2026-08-11 Ping task order parity
 
@@ -378,6 +401,7 @@
 
 ## 验证记录
 
+- 2026-09-17 v3.3.12 三网延迟：`vue-tsc --build` 通过；`git diff --check` 通过；本机 `http://localhost:5173/` 默认关闭时首页卡片仍只有延迟/丢包，无 `[data-three-net-ping]`。实时 `node.ping` 已写入 store。开启态需管理员在主题设置打开开关并选择最多 3 个任务后验证。`bun run lint` 因本机 Bun/Node 缺少 `Object.groupBy` 未作为通过证据。
 - 2026-07-14 v3.1.4 Issue #18 release：`bun run lint`、`bun run build`、`git diff --check` 通过；发布提交 `91c9b06` 已推送 `main`，Actions run `#29312369165`（#49）成功，tag / Release target 均为完整提交 `91c9b06fc5c4b5ee2636dc18779861186806abd7`，Issue #18 已关闭。线上 zip `komari-theme-Glassmorphism-build-91c9b06.zip` 大小 5,114,852 bytes，SHA-256 `f8b4c9b6f61cc66d755d7a612357d16d1d2774f9494b9b0c3ce87e572ee5da9b`，下载复核顶层结构 `komari-theme.json`、`preview.png`、`dist/`，包内版本 `3.1.4`。构建仍只有既有 `@vueuse/core` PURE 注释与 `globe` 大 chunk 警告。
 - 2026-07-14 v3.1.3 release：发布提交 `4f37416` 已推送 `main`；GitHub Actions run `#29311122789` 成功。Release `v3.1.3` 为正式发布（非 draft / prerelease），target 为完整提交 `4f3741692bd81141ed542614d5b31a01ff0dc0fc`，zip 资产 `komari-theme-Glassmorphism-build-4f37416.zip` 上传状态为 `uploaded`。下载复核：大小 5,120,783 bytes，SHA-256 `f4d5f1be0c769ffc5372ab6a9b780042768f82529827b7222a843ef642605bee`，顶层结构 `komari-theme.json`、`preview.png`、`dist/`，包内版本 `3.1.3`。
 - 2026-07-14 v3.1.0 release：发布提交 `14dac71` 已推送 `main`；GitHub Actions run `#42` 成功。Release `v3.1.0` 为正式发布（非 draft / prerelease），target 为完整提交 `14dac711d3e1ad1e7963c6dc2609ab6d1921f82d`，zip 资产上传状态为 `uploaded`。
@@ -413,6 +437,12 @@
 - 不应对整个 `NodeData` 使用 `markRaw`，否则会破坏实时 CPU、内存、网络和在线状态响应式刷新。
 
 ## 交接说明
+
+v3.3.12 三网延迟：
+
+- 代码已完成，未提交、未发布。启用方式：导入/更新主题 zip 后，在 Komari 主题设置打开「显示三网延迟」，再在「三网延迟任务」里选最多 3 个 Ping 任务（本机现有任务建议 广东省-电信 / 联通 / 移动）。
+- 默认关闭不影响现有卡片高度。列表视图未加该行。
+- 下一步若发布：提交 `komari-theme.json` 3.3.12 与相关源码/README，走既有 Release 工作流；发布后在后台保存主题设置才能在线上看到三网行。
 
 已完成：
 

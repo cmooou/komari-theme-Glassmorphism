@@ -7,6 +7,7 @@ import { CardX } from '@/components/ui/card-x'
 import { DataTooltip } from '@/components/ui/data-tooltip'
 import { ProgressThin } from '@/components/ui/progress-thin'
 import { useNodePingDisplay } from '@/composables/useNodePingDisplay'
+import { useThreeNetPing } from '@/composables/useThreeNetPing'
 import { useAppStore } from '@/stores/app'
 import { formatBytesPerSecondWithConfig, formatBytesWithConfig, formatDateTime, getStatus, getUptimeDays } from '@/utils/helper'
 import { getDiskPercentage, getMemoryPercentage, getTrafficUsed, getTrafficUsedPercentage, hasTrafficLimit } from '@/utils/nodeMetricsHelper'
@@ -89,7 +90,53 @@ const {
   lossDisplay,
   latencyPanelTooltip,
   lossPanelTooltip,
+  records,
+  metricStats,
+  metricLossPoints,
+  loading,
 } = useNodePingDisplay(() => props.node.uuid, { enabled: () => props.pingEnabled })
+const { visible: threeNetPingVisible, items: threeNetPingItems } = useThreeNetPing(() => props.node, {
+  records,
+  metricStats,
+  metricLossPoints,
+  loading,
+})
+
+const pingPanelRows = computed(() => {
+  if (threeNetPingVisible.value) {
+    return threeNetPingItems.value.map(item => ({
+      key: `task-${item.id}`,
+      latencyLabel: item.label,
+      latencyDisplay: item.latencyDisplay,
+      latencyTooltip: item.latencyTooltip,
+      latencyAria: `${props.node.name} ${item.fullName} 延迟`,
+      latencyBars: item.latencyBars,
+      latencyBarsAttr: `task-${item.id}-latency`,
+      lossLabel: '丢包',
+      lossDisplay: item.lossDisplay,
+      lossTooltip: item.lossTooltip,
+      lossAria: `${props.node.name} ${item.fullName} 丢包`,
+      lossBars: item.lossBars,
+      lossBarsAttr: `task-${item.id}-loss`,
+    }))
+  }
+
+  return [{
+    key: 'summary',
+    latencyLabel: '延迟',
+    latencyDisplay: latencyDisplay.value,
+    latencyTooltip: latencyPanelTooltip.value,
+    latencyAria: `${props.node.name} 延迟监测`,
+    latencyBars: latencyRenderBars.value,
+    latencyBarsAttr: 'latency',
+    lossLabel: '丢包',
+    lossDisplay: lossDisplay.value,
+    lossTooltip: lossPanelTooltip.value,
+    lossAria: `${props.node.name} 丢包监测`,
+    lossBars: lossRenderBars.value,
+    lossBarsAttr: 'loss',
+  }]
+})
 
 const trafficUsedPercentage = computed(() => getTrafficUsedPercentage(props.node))
 const trafficUsed = computed(() => getTrafficUsed(props.node))
@@ -447,65 +494,74 @@ function hasRegion(region: string | null | undefined): boolean {
           </div>
         </div>
 
-        <!-- 延迟 + 丢包 -->
-        <div class="grid grid-cols-2 gap-1.5">
-          <button
-            type="button"
-            class="group/panel relative flex flex-col rounded-lg bg-slate-500/5"
-            :class="[nodeCardPingPanelClass, nodeCardPanelClass, !props.node.online ? 'blur-xs opacity-50' : '']"
-            :title="latencyPanelTooltip"
-            :aria-label="`${props.node.name} 延迟监测`"
-            @click.stop="emit('pingClick')"
+        <!-- 延迟 + 丢包：默认一组总览；开启三网后变成所选任务的三组 -->
+        <div
+          :data-three-net-ping="threeNetPingVisible ? '' : undefined"
+          class="flex flex-col gap-1.5"
+        >
+          <div
+            v-for="row in pingPanelRows"
+            :key="row.key"
+            class="grid grid-cols-2 gap-1.5"
           >
-            <div class="flex items-center justify-between text-[11px] leading-none">
-              <span class="text-muted-foreground">延迟</span>
-              <span class="font-medium">{{ latencyDisplay }}</span>
-            </div>
-            <div
-              data-node-ping-bars="latency"
-              class="grid min-h-0 min-w-0 w-full flex-1 items-end gap-[1px] opacity-80 group-hover/panel:opacity-100"
-              :style="{ gridTemplateColumns: `repeat(${latencyRenderBars.length}, minmax(0, 1fr))` }"
+            <button
+              type="button"
+              class="group/panel relative flex min-w-0 flex-col rounded-lg bg-slate-500/5"
+              :class="[nodeCardPingPanelClass, nodeCardPanelClass, !props.node.online ? 'blur-xs opacity-50' : '']"
+              :title="row.latencyTooltip"
+              :aria-label="row.latencyAria"
+              @click.stop="emit('pingClick')"
             >
-              <DataTooltip
-                v-for="bar in latencyRenderBars" :key="bar.key"
-                placement="top" :content="bar.tooltip" class="h-full w-full"
+              <div class="flex min-w-0 items-center justify-between gap-1 text-[11px] leading-none">
+                <span class="truncate text-muted-foreground">{{ row.latencyLabel }}</span>
+                <span class="shrink-0 font-medium tabular-nums">{{ row.latencyDisplay }}</span>
+              </div>
+              <div
+                :data-node-ping-bars="row.latencyBarsAttr"
+                class="grid min-h-0 min-w-0 w-full flex-1 items-end gap-[1px] opacity-80 group-hover/panel:opacity-100"
+                :style="{ gridTemplateColumns: `repeat(${row.latencyBars.length}, minmax(0, 1fr))` }"
               >
-                <span
-                  class="block h-full w-full rounded-[1px] transition-transform duration-150 group-hover/data-tooltip:scale-y-160 group-hover/panel:opacity-60 group-hover/data-tooltip:!opacity-100"
-                  :class="bar.className"
-                />
-              </DataTooltip>
-            </div>
-          </button>
+                <DataTooltip
+                  v-for="bar in row.latencyBars" :key="bar.key"
+                  placement="top" :content="bar.tooltip" class="h-full w-full"
+                >
+                  <span
+                    class="block h-full w-full rounded-[1px] transition-transform duration-150 group-hover/data-tooltip:scale-y-160 group-hover/panel:opacity-60 group-hover/data-tooltip:!opacity-100"
+                    :class="bar.className"
+                  />
+                </DataTooltip>
+              </div>
+            </button>
 
-          <button
-            type="button"
-            class="group/panel relative flex flex-col rounded-lg bg-slate-500/5"
-            :class="[nodeCardPingPanelClass, nodeCardPanelClass, !props.node.online ? 'blur-xs opacity-50' : '']"
-            :title="lossPanelTooltip"
-            :aria-label="`${props.node.name} 丢包监测`"
-            @click.stop="emit('pingClick')"
-          >
-            <div class="flex items-center justify-between text-[11px] leading-none">
-              <span class="text-muted-foreground">丢包</span>
-              <span class="font-medium">{{ lossDisplay }}</span>
-            </div>
-            <div
-              data-node-ping-bars="loss"
-              class="grid min-h-0 min-w-0 w-full flex-1 items-end gap-[1px] opacity-80 group-hover/panel:opacity-100"
-              :style="{ gridTemplateColumns: `repeat(${lossRenderBars.length}, minmax(0, 1fr))` }"
+            <button
+              type="button"
+              class="group/panel relative flex min-w-0 flex-col rounded-lg bg-slate-500/5"
+              :class="[nodeCardPingPanelClass, nodeCardPanelClass, !props.node.online ? 'blur-xs opacity-50' : '']"
+              :title="row.lossTooltip"
+              :aria-label="row.lossAria"
+              @click.stop="emit('pingClick')"
             >
-              <DataTooltip
-                v-for="bar in lossRenderBars" :key="bar.key"
-                placement="top" :content="bar.tooltip" class="h-full w-full"
+              <div class="flex min-w-0 items-center justify-between gap-1 text-[11px] leading-none">
+                <span class="truncate text-muted-foreground">{{ row.lossLabel }}</span>
+                <span class="shrink-0 font-medium tabular-nums">{{ row.lossDisplay }}</span>
+              </div>
+              <div
+                :data-node-ping-bars="row.lossBarsAttr"
+                class="grid min-h-0 min-w-0 w-full flex-1 items-end gap-[1px] opacity-80 group-hover/panel:opacity-100"
+                :style="{ gridTemplateColumns: `repeat(${row.lossBars.length}, minmax(0, 1fr))` }"
               >
-                <span
-                  class="block h-full w-full rounded-[1px] transition-transform duration-150 group-hover/data-tooltip:scale-y-160 group-hover/panel:opacity-60 group-hover/data-tooltip:!opacity-100"
-                  :class="bar.className"
-                />
-              </DataTooltip>
-            </div>
-          </button>
+                <DataTooltip
+                  v-for="bar in row.lossBars" :key="bar.key"
+                  placement="top" :content="bar.tooltip" class="h-full w-full"
+                >
+                  <span
+                    class="block h-full w-full rounded-[1px] transition-transform duration-150 group-hover/data-tooltip:scale-y-160 group-hover/panel:opacity-60 group-hover/data-tooltip:!opacity-100"
+                    :class="bar.className"
+                  />
+                </DataTooltip>
+              </div>
+            </button>
+          </div>
         </div>
 
         <!-- 自定义标签 -->

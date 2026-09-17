@@ -131,11 +131,14 @@ const sitename = computed(() => appStore.publicSettings?.sitename || 'Komari Mon
 
 <style scoped>
 .app-header {
-  padding-top: var(--komari-safe-area-top);
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-top: var(--komari-safe-area-top, env(safe-area-inset-top, 0px));
 }
 
 .app-header-content {
-  padding-right: max(1rem, var(--komari-safe-area-right));
-  padding-left: max(1rem, var(--komari-safe-area-left));
+  padding-right: max(1rem, env(safe-area-inset-right, 0px));
+  padding-right: max(1rem, var(--komari-safe-area-right, env(safe-area-inset-right, 0px)));
+  padding-left: max(1rem, env(safe-area-inset-left, 0px));
+  padding-left: max(1rem, var(--komari-safe-area-left, env(safe-area-inset-left, 0px)));
 }
 </style>

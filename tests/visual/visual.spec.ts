@@ -137,6 +137,91 @@ test('iOS standalone safe areas keep header and fixed controls reachable', async
   expect(settingsBox?.y).toBeGreaterThanOrEqual(59)
 })
 
+test('iOS page zoom enlarges safe-area padding so header stays below the inset', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await installKomariFixture(page, { hideEarth: true })
+  await openStablePage(page)
+  await page.evaluate(() => {
+    document.documentElement.style.setProperty('--komari-safe-area-zoom', '2')
+  })
+  await page.addStyleTag({
+    content: `
+      :root {
+        --komari-safe-area-top: calc(59px * var(--komari-safe-area-zoom, 1));
+        --komari-safe-area-right: calc(21px * var(--komari-safe-area-zoom, 1));
+        --komari-safe-area-bottom: calc(34px * var(--komari-safe-area-zoom, 1));
+        --komari-safe-area-left: calc(47px * var(--komari-safe-area-zoom, 1));
+      }
+    `,
+  })
+
+  const header = page.locator('[data-app-header]')
+  const headerContent = page.locator('[data-app-header-content]')
+  await expect(header).toHaveCSS('padding-top', '118px')
+  await expect(headerContent).toHaveCSS('padding-left', '94px')
+  await expect(headerContent).toHaveCSS('padding-right', '42px')
+
+  const settingsButton = page.getByRole('button', { name: '后台管理' })
+  const settingsBox = await settingsButton.boundingBox()
+  expect(settingsBox?.y).toBeGreaterThanOrEqual(118)
+})
+
+test('iOS page zoom factor follows layout vs visual short side', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await installKomariFixture(page, { hideEarth: true })
+  await openStablePage(page)
+  await page.evaluate(() => {
+    Object.defineProperty(window, 'innerWidth', { configurable: true, get: () => 780 })
+    Object.defineProperty(window, 'innerHeight', { configurable: true, get: () => 1688 })
+    Object.defineProperty(document.documentElement, 'clientWidth', { configurable: true, get: () => 780 })
+    Object.defineProperty(document.documentElement, 'clientHeight', { configurable: true, get: () => 1688 })
+    Object.defineProperty(window.screen, 'width', { configurable: true, get: () => 390 })
+    Object.defineProperty(window.screen, 'height', { configurable: true, get: () => 844 })
+    if (window.visualViewport) {
+      Object.defineProperty(window.visualViewport, 'width', { configurable: true, get: () => 390 })
+      Object.defineProperty(window.visualViewport, 'height', { configurable: true, get: () => 844 })
+      Object.defineProperty(window.visualViewport, 'scale', { configurable: true, get: () => 1 })
+    }
+    window.dispatchEvent(new Event('resize'))
+  })
+  await page.evaluate(() => new Promise<void>((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+  }))
+  await expect.poll(() => page.evaluate(() =>
+    getComputedStyle(document.documentElement).getPropertyValue('--komari-safe-area-zoom').trim(),
+  )).toBe('2')
+})
+
+test('three-net ping replaces summary bars with selected tasks', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 })
+  await installKomariFixture(page, { hideEarth: true, threeNetPing: true })
+  await openStablePage(page)
+
+  const card = page.getByRole('button', { name: '查看节点 主控-洛杉矶 详情' })
+  await expect(card.locator('[data-three-net-ping]')).toBeVisible()
+  await expect(card.locator('[data-node-ping-bars="latency"]')).toHaveCount(0)
+  await expect(card.getByText('广东电信', { exact: true })).toBeVisible()
+  await expect(card.getByText('广东移动', { exact: true })).toBeVisible()
+  await expect(card.getByText('广东联通', { exact: true })).toBeVisible()
+
+  for (const taskId of [1, 3, 4]) {
+    for (const metric of ['latency', 'loss']) {
+      const bars = card.locator(`[data-node-ping-bars="task-${taskId}-${metric}"]`)
+      await expect(bars).toBeVisible()
+      await expect.poll(() => bars.evaluate(element => element.getBoundingClientRect().width)).toBeGreaterThan(0)
+    }
+  }
+
+  const lossTooltips = card.locator('[data-node-ping-bars="task-1-loss"] [role="tooltip"]')
+  await expect.poll(async () => {
+    const texts = await lossTooltips.allTextContents()
+    return texts.some((text) => {
+      const match = text.match(/(\d+(?:\.\d+)?)%/)
+      return Boolean(match && Number(match[1]) > 0)
+    })
+  }).toBeTruthy()
+})
+
 test('node card expiry uses red through 5 days and yellow through 10 days', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 })
   await installKomariFixture(page, { expiryThresholds: true, hideEarth: true })

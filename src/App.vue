@@ -4,6 +4,7 @@ import { nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { Alert, AlertAction, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Toaster } from '@/components/ui/sonner'
+import { useSafeAreaZoom } from '@/composables/useSafeAreaZoom'
 import { useVisitorPageAudit } from '@/composables/useVisitorAudit'
 import { useAppStore } from '@/stores/app'
 import { destroyInitManager, initApp, retryInitApp } from '@/utils/init'
@@ -15,6 +16,7 @@ import Provider from './components/Provider.vue'
 
 const appStore = useAppStore()
 useVisitorPageAudit()
+useSafeAreaZoom()
 
 const isReady = ref(false)
 const isRetryingConnection = ref(false)
