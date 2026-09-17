@@ -12,10 +12,12 @@
 
 ## 当前任务
 
-- 状态：in-progress，提交当前改动并发布 v3.3.14 GitHub Release。
-- 版本：`komari-theme.json` `3.3.13` → `3.3.14`。
-- 发布路径：push `main` 后由 `release-on-version-bump.yml` 打 tag `v3.3.14` 并上传 zip。
-- 包含：三网新版样式开关（默认关）、本地 admin 代理、文档、未推送的 sparkline/admin-app 提交。
+- 状态：done，v3.3.14 已提交、推送并发布 GitHub Release。
+- 提交：`0bd4ad1` `feat: add optional three-net sparkline style and release 3.3.14`（另含未单独推送的 `6064292`）。
+- Release：https://github.com/towersip/komari-theme-Glassmorphism/releases/tag/v3.3.14 正式发布，非 draft / prerelease。
+- 资产：`komari-theme-Glassmorphism-build-0bd4ad1.zip`，5,148,508 bytes，SHA-256 `ae0a46743a42cc7fe8f7f0094e2aac3e38053193f689706b77ca79fc0fc43c3d`。
+- 说明：仓库 Actions 无 workflow run，Release 由本地构建 + tag `v3.3.14` 创建。
+- 不做：不 force-push。
 
 ## 上一任务
 
