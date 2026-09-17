@@ -52,6 +52,31 @@ test('home dark mobile', async ({ page }) => {
   await expect(page).toHaveScreenshot('home-dark-mobile.png', { fullPage: false })
 })
 
+test('custom background follows viewport orientation', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await installKomariFixture(page, {
+    hideEarth: true,
+    backgroundUrls: {
+      light: 'https://visual.test/base.svg',
+      lightLandscape: 'https://visual.test/landscape.svg',
+      lightPortrait: 'https://visual.test/portrait-a.svg、https://visual.test/portrait-b.svg',
+    },
+  })
+  await page.route('https://visual.test/*.svg', route => route.fulfill({
+    contentType: 'image/svg+xml',
+    body: '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8"><rect width="8" height="8" fill="#0ea5e9"/></svg>',
+  }))
+  await openStablePage(page)
+
+  const background = page.locator('.background-image')
+  await expect(background).toBeVisible()
+  const backgroundImage = () => background.evaluate(element => getComputedStyle(element).backgroundImage)
+  await expect.poll(backgroundImage).toMatch(/portrait-[ab]\.svg/)
+
+  await page.setViewportSize({ width: 1280, height: 720 })
+  await expect.poll(backgroundImage).toContain('landscape.svg')
+})
+
 test('home accessible list desktop', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 })
   await installKomariFixture(page, { colorVisionFriendly: true, viewMode: 'list', hideEarth: true })

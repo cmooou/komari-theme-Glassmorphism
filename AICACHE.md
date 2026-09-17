@@ -12,6 +12,13 @@
 
 ## 当前任务
 
+- 状态：in-progress，准备发布 v3.3.16；已将本地横竖屏背景与中文顿号多图支持纳入发布版本。
+- 内容：新增 `backgroundOrientationMode`（auto / landscape / portrait）以及亮暗模式的横屏、竖屏背景地址。auto 根据 `window.innerWidth` / `window.innerHeight` 及 resize/orientationchange 选择方向；方向地址留空时回退到原亮暗背景地址，兼容现有随机壁纸 API 与 `local:` 资源。多图地址支持换行、英文逗号、中文顿号、竖线和分号。
+- 当前修改：`src/stores/app.ts`、`src/components/Background.vue`、`komari-theme.json`、`README.md` 和视觉夹具已更新；版本号已提升到 `3.3.16`。
+- 验证：`vue-tsc --build`、`vite build`、改动运行时代码 ESLint、`git diff --check` 通过；系统 Chrome 下完整视觉套件 23/23（含方向切换用例）通过，重新构建后中文顿号多图用例 1/1 通过。视觉夹具仍有本轮之前的既有缩进 lint 报错；Playwright 内置 Chromium 未安装，因此未用该渠道运行。
+
+## 上一任务
+
 - 状态：done，v3.3.15 三网丢包对齐修复包已发布。
 - 内容：三网新版 Sparkline 行收紧间距；固定「丢包」标签列；百分比右对齐；增加窄屏标签对齐回归断言；主题清单和 README 更新到 3.3.15。
 - 提交：`55aa378` `fix: align three-net loss labels and release 3.3.15`；已推送 `main`。

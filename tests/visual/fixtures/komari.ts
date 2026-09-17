@@ -29,6 +29,15 @@ export interface VisualFixtureOptions {
   threeNetPing?: boolean
   threeNetPingSparkline?: boolean
   generalCardKeys?: string[]
+  backgroundOrientationMode?: 'auto' | 'landscape' | 'portrait'
+  backgroundUrls?: {
+    light?: string
+    dark?: string
+    lightLandscape?: string
+    lightPortrait?: string
+    darkLandscape?: string
+    darkPortrait?: string
+  }
 }
 
 function uuidFor(index: number): string {
@@ -382,6 +391,19 @@ export async function installKomariFixture(page: Page, options: VisualFixtureOpt
         }
       : {}),
     ...(options.threeNetPingSparkline ? { threeNetPingSparkline: true } : {}),
+    ...(options.backgroundUrls
+      ? {
+          backgroundEnabled: true,
+          backgroundType: 'image',
+          backgroundOrientationMode: options.backgroundOrientationMode ?? 'auto',
+          lightBackgroundUrl: options.backgroundUrls.light ?? '',
+          darkBackgroundUrl: options.backgroundUrls.dark ?? '',
+          lightBackgroundLandscapeUrl: options.backgroundUrls.lightLandscape ?? '',
+          lightBackgroundPortraitUrl: options.backgroundUrls.lightPortrait ?? '',
+          darkBackgroundLandscapeUrl: options.backgroundUrls.darkLandscape ?? '',
+          darkBackgroundPortraitUrl: options.backgroundUrls.darkPortrait ?? '',
+        }
+      : {}),
   }
 
   await page.addInitScript(({ fixedNow }) => {

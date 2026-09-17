@@ -3,11 +3,13 @@ import type { MeInfo, PublicSettings } from '@/utils/api'
 import type { ByteDecimalsConfig } from '@/utils/helper'
 import { useStorageAsync } from '@vueuse/core'
 import { defineStore } from 'pinia'
-import { computed, ref, watch } from 'vue'
+import { computed, onScopeDispose, ref, watch } from 'vue'
 import { getAuthSession, requirePermission, setAuthSessionFromLogin, verifyLogin } from '@/services/auth.service'
 
 export type ThemeMode = 'auto' | 'light' | 'dark'
 export type ManagedThemeMode = 'beijing' | 'light' | 'dark'
+type BackgroundOrientation = 'landscape' | 'portrait'
+type BackgroundOrientationMode = 'auto' | BackgroundOrientation
 export type GeneralCardKey
   = | 'currentTime'
     | 'memory'
@@ -854,11 +856,8 @@ function resolveBackgroundSource(value: unknown): string {
   return `/themes/user-assets/${segments.map(segment => encodeURIComponent(segment)).join('/')}`
 }
 
-const BACKGROUND_SOURCE_SPLIT_RE = /\n+|\s*[|;]\s*|,(?=\s*(?:https?:|\/|local:))/i
-const sessionBackgroundPicks: Record<'light' | 'dark', string> = {
-  light: '',
-  dark: '',
-}
+const BACKGROUND_SOURCE_SPLIT_RE = /\n+|\s*[|;、]\s*|[,，](?=\s*(?:https?:|\/|local:))/i
+const sessionBackgroundPicks: Record<string, string> = {}
 
 function parseBackgroundSources(value: unknown): string[] {
   if (typeof value !== 'string')
@@ -872,17 +871,32 @@ function parseBackgroundSources(value: unknown): string[] {
   return [...new Set(sources)]
 }
 
-function pickSessionBackground(mode: 'light' | 'dark', sources: string[]): string {
+function pickSessionBackground(key: string, sources: string[]): string {
   if (!sources.length)
     return ''
 
-  const current = sessionBackgroundPicks[mode]
+  const current = sessionBackgroundPicks[key]
   if (current && sources.includes(current))
     return current
 
   const picked = sources[Math.floor(Math.random() * sources.length)] ?? sources[0] ?? ''
-  sessionBackgroundPicks[mode] = picked
+  sessionBackgroundPicks[key] = picked
   return picked
+}
+
+function getViewportOrientation(): BackgroundOrientation {
+  if (typeof window === 'undefined')
+    return 'landscape'
+
+  return window.innerHeight > window.innerWidth ? 'portrait' : 'landscape'
+}
+
+function getOrientationBackgroundKey(mode: 'light' | 'dark', orientation: BackgroundOrientation): string {
+  return `${mode}Background${orientation === 'portrait' ? 'Portrait' : 'Landscape'}Url`
+}
+
+function getBaseBackgroundKey(mode: 'light' | 'dark'): string {
+  return `${mode}BackgroundUrl`
 }
 
 function readColorSetting(settings: ThemeSettings, key: string, fallback: string): string {
@@ -1270,13 +1284,55 @@ const useAppStore = defineStore('app', () => {
     return 'image'
   })
 
-  const lightBackgroundUrl = computed<string>(() => {
-    return pickSessionBackground('light', parseBackgroundSources(themeSettings.value.lightBackgroundUrl))
+  const viewportOrientation = ref<BackgroundOrientation>(getViewportOrientation())
+
+  function updateViewportOrientation() {
+    const nextOrientation = getViewportOrientation()
+    if (nextOrientation !== viewportOrientation.value)
+      viewportOrientation.value = nextOrientation
+  }
+
+  if (typeof window !== 'undefined') {
+    window.addEventListener('resize', updateViewportOrientation)
+    window.addEventListener('orientationchange', updateViewportOrientation)
+    onScopeDispose(() => {
+      window.removeEventListener('resize', updateViewportOrientation)
+      window.removeEventListener('orientationchange', updateViewportOrientation)
+    })
+  }
+
+  const backgroundOrientationMode = computed<BackgroundOrientationMode>(() => {
+    const mode = themeSettings.value.backgroundOrientationMode
+    return mode === 'landscape' || mode === 'portrait' ? mode : 'auto'
   })
 
-  const darkBackgroundUrl = computed<string>(() => {
-    return pickSessionBackground('dark', parseBackgroundSources(themeSettings.value.darkBackgroundUrl))
+  const resolvedBackgroundOrientation = computed<BackgroundOrientation>(() => {
+    const mode = backgroundOrientationMode.value
+    return mode === 'auto' ? viewportOrientation.value : mode
   })
+
+  const pickConfiguredBackground = (mode: 'light' | 'dark', orientation?: BackgroundOrientation): string => {
+    const settings = themeSettings.value
+    if (orientation) {
+      const orientationSources = parseBackgroundSources(settings[getOrientationBackgroundKey(mode, orientation)])
+      if (orientationSources.length)
+        return pickSessionBackground(`${mode}:${orientation}`, orientationSources)
+    }
+
+    return pickSessionBackground(mode, parseBackgroundSources(settings[getBaseBackgroundKey(mode)]))
+  }
+
+  const lightBackgroundUrl = computed<string>(() => pickConfiguredBackground('light'))
+
+  const darkBackgroundUrl = computed<string>(() => pickConfiguredBackground('dark'))
+
+  const lightLandscapeBackgroundUrl = computed<string>(() => pickConfiguredBackground('light', 'landscape'))
+
+  const lightPortraitBackgroundUrl = computed<string>(() => pickConfiguredBackground('light', 'portrait'))
+
+  const darkLandscapeBackgroundUrl = computed<string>(() => pickConfiguredBackground('dark', 'landscape'))
+
+  const darkPortraitBackgroundUrl = computed<string>(() => pickConfiguredBackground('dark', 'portrait'))
 
   const backgroundBlur = computed<number>(() => readNumberSetting(themeSettings.value, 'backgroundBlur', 0, 0, Number.MAX_SAFE_INTEGER))
 
@@ -1324,10 +1380,11 @@ const useAppStore = defineStore('app', () => {
 
   // 计算属性：当前主题模式下的背景 URL
   const currentBackgroundUrl = computed<string>(() => {
-    if (resolvedThemeMode.value === 'dark') {
-      return darkBackgroundUrl.value
-    }
-    return lightBackgroundUrl.value
+    const orientation = resolvedBackgroundOrientation.value
+    if (resolvedThemeMode.value === 'dark')
+      return orientation === 'portrait' ? darkPortraitBackgroundUrl.value : darkLandscapeBackgroundUrl.value
+
+    return orientation === 'portrait' ? lightPortraitBackgroundUrl.value : lightLandscapeBackgroundUrl.value
   })
 
   function updateThemeMode(mode?: ThemeMode) {
@@ -1431,6 +1488,8 @@ const useAppStore = defineStore('app', () => {
     disablePageAnimation,
     backgroundEnabled,
     backgroundType,
+    backgroundOrientationMode,
+    resolvedBackgroundOrientation,
     lightBackgroundUrl,
     darkBackgroundUrl,
     currentBackgroundUrl,
