@@ -37,7 +37,7 @@
 
 | 项目     | 说明                                                      |
 | :------- | :-------------------------------------------------------- |
-| 当前版本 | **v3.3.12**                                               |
+| 当前版本 | **v3.3.13**                                               |
 | 主题定位 | Komari Monitor 可导入 zip 主题，不是普通 Web App 部署包   |
 | 视觉风格 | 毛玻璃卡片、动态背景、浅色 / 深色 / 北京时间自动日夜模式  |
 | 数据能力 | Metric Store 优先，旧接口自动 fallback，兼容 Komari 1.2.x |
@@ -45,6 +45,13 @@
 | 发布产物 | `komari-theme-Glassmorphism-build-<short-sha>.zip`        |
 
 > 好看只是外壳。v3 真正的重点，是把 Metric、Ping、流量、费用、健康分析和运维工具整合成日常真的会打开来看的监控面板。
+
+---
+
+## 🏪 v3.3.13 主题商店独立短名称
+
+- 市场唯一短名称改为 `GlassmorphismTS`，可与已上架的 `Glassmorphism` 并存
+- 显示名称为 Komari Glassmorphism TS；安装后主题目录按新 short 存放
 
 ---
 
@@ -558,6 +565,14 @@ dist/
 ## 📝 更新日志
 
 <details open>
+<summary><strong>v3.3.13 · 主题商店独立短名称</strong></summary>
+
+- 市场唯一短名称改为 `GlassmorphismTS`，避免与已上架的 `Glassmorphism` 冲突
+- 显示名称为 Komari Glassmorphism TS
+
+</details>
+
+<details>
 <summary><strong>v3.3.12 · 节点卡片三网延迟与 iOS 缩放安全区</strong></summary>
 
 - 主题设置可开关三网延迟，并从延迟配置列表选择 1～3 个 Ping 任务，不必凑满 3 个

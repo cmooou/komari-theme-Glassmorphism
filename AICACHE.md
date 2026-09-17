@@ -12,9 +12,13 @@
 
 ## 当前任务
 
-- 状态：in-progress，发布 v3.3.12：提交并推送 main，由 Release On Version Bump 经 GitHub API 创建 Release。
-- 范围：三网延迟 + Issue #55 iOS 网页缩放安全区；版本保持 3.3.12。
-- 本地：Node 22 ESLint 与 `vue-tsc --build` 通过。
+- 状态：in-progress，以独立 short `GlassmorphismTS` 重新上架主题商店；版本 3.3.13。
+- 原因：#105 因 `Glassmorphism` 已被 sanrokamlan-prog 占用而关闭。
+- 下一步：发 v3.3.13 Release，编辑并 reopen https://github.com/komari-monitor/theme-market/issues/105 ，预览图改 raw 直链。
+- 提交：`7003fdf9dbfa99aa5a4623e25f68c1fc4473a56b` 已推送 `main`。
+- Release：https://github.com/towersip/komari-theme-Glassmorphism/releases/tag/v3.3.12 （正式发布，非 draft / prerelease；target 与 tag 均为该提交）。
+- 资产：`komari-theme-Glassmorphism-build-7003fdf.zip`，5,150,020 bytes，SHA-256 `59EF6706EF35B9BA8406C0474F11D9CC8A0DC9D4951234A769D908E38DA76B2F`；顶层 `komari-theme.json` / `preview.png` / `dist/`；版本 3.3.12；含三网设置。
+- 范围：三网延迟 + Issue #55 iOS 网页缩放安全区。
 - 不做：不升 3.3.13。
 
 - 状态：done，v3.3.12 code review 修复已落地：Safari aA 用 layout/visual 短边比检测缩放；三网 Metric 丢包柱按 taskId 过滤 `metricLossPoints`；顶栏改回 `z-10`；inset 带 `env()` 回退。
