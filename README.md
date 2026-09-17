@@ -71,6 +71,7 @@ https://github.com/towersip/komari-theme-Glassmorphism
 - 打开后改为名称 + 当前延迟 + Sparkline 折线 + 丢包率；未开三网时只影响卡片上的一组总览
 - 本地 `bun run dev` 把 `/admin`、`/terminal`、`/assets` 代理到 Komari 1.5 内置管理端，方便改主题设置
 - 主题包不再携带旧 `admin-app`
+- 修复移动端滚动列表时背景图抖动、发糊（去掉 `background-attachment: fixed`）
 
 ---
 
@@ -620,6 +621,7 @@ dist/
 - 开启后显示名称、当前延迟、历史 Sparkline 和丢包率
 - 开发服代理 Komari 1.5 内置 `/admin`、`/terminal` 和 `/assets`
 - 安装包不再包含旧 `admin-app`
+- 修复移动端滚动时背景图抖动、发糊
 
 </details>
 

@@ -12,6 +12,12 @@
 
 ## 当前任务
 
+- 状态：in-progress，重新打包并覆盖发布 v3.3.14（含移动端背景滚动修复）。
+- 版本：保持 `komari-theme.json` `3.3.14`。
+- 将移动 tag `v3.3.14` 到修复提交，并替换 GitHub Release zip。
+
+## 上一任务
+
 - 状态：done，v3.3.14 已提交、推送并发布 GitHub Release。
 - 提交：`0bd4ad1` `feat: add optional three-net sparkline style and release 3.3.14`（另含未单独推送的 `6064292`）。
 - Release：https://github.com/towersip/komari-theme-Glassmorphism/releases/tag/v3.3.14 正式发布，非 draft / prerelease。
