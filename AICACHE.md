@@ -12,9 +12,11 @@
 
 ## 当前任务
 
-- 状态：in-progress，重新打包并覆盖发布 v3.3.14（含移动端背景滚动修复）。
-- 版本：保持 `komari-theme.json` `3.3.14`。
-- 将移动 tag `v3.3.14` 到修复提交，并替换 GitHub Release zip。
+- 状态：done，已重新打包并覆盖发布 v3.3.14（含移动端背景滚动修复）。
+- 提交：`3adc5e8` `fix: stop mobile background jitter from attachment fixed`
+- Release：https://github.com/towersip/komari-theme-Glassmorphism/releases/tag/v3.3.14 正式发布，非 draft / prerelease；tag 指向 `3adc5e8`。
+- 资产：`komari-theme-Glassmorphism-build-3adc5e8.zip`，5,148,506 bytes，SHA-256 `3305bdb3e6e052415382aa4b0715f49d66317cc73dd28caeba8af18ed2801f2a`。
+- 旧包 `...-0bd4ad1.zip` 已从该 Release 移除。
 
 ## 上一任务
 
