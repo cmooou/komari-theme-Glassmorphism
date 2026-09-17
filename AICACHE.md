@@ -12,10 +12,12 @@
 
 ## 当前任务
 
-- 状态：进行中，准备发布 v3.3.15 三网丢包对齐修复包。
+- 状态：done，v3.3.15 三网丢包对齐修复包已发布。
 - 内容：三网新版 Sparkline 行收紧间距；固定「丢包」标签列；百分比右对齐；增加窄屏标签对齐回归断言；主题清单和 README 更新到 3.3.15。
-- 发布：本地构建并校验 `komari-theme-Glassmorphism-build-<short-sha>.zip`，提交并推送 `main`，由版本变更工作流创建 `v3.3.15` Release；发布后核验 Release、资产和包内版本。
-- 验证：三网 Playwright 用例 3/3、改动文件 ESLint 已通过；全量 ESLint 仍有仓库既有 Markdown 格式、Sparkline 正则和 `tagHelper.ts:317` 等基线问题，已记录，不扩大本次范围。
+- 提交：`55aa378` `fix: align three-net loss labels and release 3.3.15`；已推送 `main`。
+- Release：https://github.com/towersip/komari-theme-Glassmorphism/releases/tag/v3.3.15 正式发布，非 draft / prerelease；tag 和 Release 均指向 `55aa378b2d9db2072e9890c781351b7c87ce91bd`。
+- 资产：`komari-theme-Glassmorphism-build-55aa378.zip`，5,155,059 bytes，SHA-256 `6C6FE7294795ECF3B22752CEAE58D029D0EF7F59A8727A447AF5E908C69EF5E1`；GitHub API digest 与本地一致，包内版本 `3.3.15`，353 个条目。
+- 验证：三网 Playwright 用例 3/3、`vue-tsc --build`、构建与改动文件 ESLint 已通过；全量 ESLint 仍有仓库既有 Markdown 格式、Sparkline 正则和 `tagHelper.ts:317` 等基线问题，已记录，不扩大本次范围。
 
 ## 上一任务
 
