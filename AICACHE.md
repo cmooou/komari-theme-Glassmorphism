@@ -12,10 +12,13 @@
 
 ## 当前任务
 
-- 状态：in-progress，准备发布 v3.3.16；已将本地横竖屏背景与中文顿号多图支持纳入发布版本。
+- 状态：done，v3.3.16 已通过 GitHub API 发布。
 - 内容：新增 `backgroundOrientationMode`（auto / landscape / portrait）以及亮暗模式的横屏、竖屏背景地址。auto 根据 `window.innerWidth` / `window.innerHeight` 及 resize/orientationchange 选择方向；方向地址留空时回退到原亮暗背景地址，兼容现有随机壁纸 API 与 `local:` 资源。多图地址支持换行、英文逗号、中文顿号、竖线和分号。
 - 当前修改：`src/stores/app.ts`、`src/components/Background.vue`、`komari-theme.json`、`README.md` 和视觉夹具已更新；版本号已提升到 `3.3.16`。
 - 验证：`vue-tsc --build`、`vite build`、改动运行时代码 ESLint、`git diff --check` 通过；系统 Chrome 下完整视觉套件 23/23（含方向切换用例）通过，重新构建后中文顿号多图用例 1/1 通过。视觉夹具仍有本轮之前的既有缩进 lint 报错；Playwright 内置 Chromium 未安装，因此未用该渠道运行。
+- 提交：`4d7ed49` `feat: add responsive background orientation and multi-source urls`，已推送 `main`。
+- Release：https://github.com/towersip/komari-theme-Glassmorphism/releases/tag/v3.3.16 正式发布，非 draft / prerelease；tag 指向 `4d7ed49a608653ec17a5fb14ec30bbaca2958b80`。
+- 资产：`komari-theme-Glassmorphism-build-4d7ed49.zip`，5,155,622 bytes，SHA-256 `FD938D4F6DE48A92A0F47B272D2C8F6F557EFD6498299D5E98ECCDAB8A412C83`；GitHub API digest 与本地一致，包内版本 `3.3.16`，353 个条目。
 
 ## 上一任务
 
