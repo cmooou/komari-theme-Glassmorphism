@@ -266,11 +266,11 @@ const enableNodeCardTransition = computed(() => !appStore.disablePageAnimation &
 const reduceDenseNodeEffects = computed(() => appStore.nodeViewMode === 'card' && nodeList.value.length > denseNodePingAnimationThreshold)
 const deferNodeCards = computed(() => appStore.nodeViewMode === 'card' && nodeList.value.length > UI_CONFIG.virtualList.nodeThreshold)
 const deferredNodeCardHeight = computed(() => {
-  const baseHeight = { mini: 220, compact: 270, comfortable: 310, large: 350 }[appStore.nodeCardSize]
+  const baseHeight = { mini: 200, compact: 248, comfortable: 288, large: 328 }[appStore.nodeCardSize]
   if (!appStore.threeNetPingEnabled || appStore.threeNetPingTaskIds.length === 0)
     return baseHeight
   const extraRows = Math.max(0, appStore.threeNetPingTaskIds.length - 1)
-  const rowHeight = { mini: 36, compact: 50, comfortable: 54, large: 62 }[appStore.nodeCardSize]
+  const rowHeight = { mini: 22, compact: 24, comfortable: 26, large: 28 }[appStore.nodeCardSize]
   return baseHeight + extraRows * rowHeight
 })
 
@@ -449,11 +449,11 @@ const nodeCardGridClass = computed(() => {
         <Tabs v-model="appStore.nodeSelectedGroup" class="w-full flex-col gap-4">
           <div class="flex flex-col gap-2 xl:flex-row xl:items-center">
             <div class="home-controls-scroll min-w-0 overflow-x-auto overscroll-x-contain rounded-sm pointer-events-auto touch-pan-x">
-              <div class="flex w-max gap-2">
-                <TabsList class="w-max h-8 bg-background/50 backdrop-blur-xl rounded-md pointer-events-auto">
+              <div class="flex w-max items-center gap-2">
+                <TabsList class="h-8 w-max rounded-full border border-white/10 bg-background/40 p-0.5 backdrop-blur-xl pointer-events-auto">
                   <TabsTrigger
                     v-for="g in groups" :key="g.name" :value="g.name"
-                    class="h-6.5 flex-none shrink-0 text-xs border-none data-[state=active]:text-selection shadow-none rounded-sm"
+                    class="h-7 flex-none shrink-0 rounded-full border-none px-3 text-xs text-muted-foreground shadow-none data-active:!bg-background data-active:!text-foreground data-active:!shadow-sm dark:data-active:!bg-white/20 dark:data-active:!text-white"
                   >
                     {{ g.tab }}
                   </TabsTrigger>
@@ -461,20 +461,20 @@ const nodeCardGridClass = computed(() => {
 
                 <div
                   v-if="showQuickControls && activeHomeTool === 'nodes'"
-                  class="flex h-8 w-max items-center gap-1 rounded-md bg-background/50 px-1 backdrop-blur-xl pointer-events-auto"
+                  class="flex h-8 w-max items-center gap-1 rounded-full border border-white/10 bg-background/40 px-1 backdrop-blur-xl pointer-events-auto"
                 >
                   <button
                     v-for="control in quickControls" :key="control.key"
                     type="button"
-                    class="inline-flex h-6.5 flex-none shrink-0 items-center gap-1 rounded-sm px-2 text-xs text-muted-foreground transition-colors hover:text-foreground"
-                    :class="activeQuickControl === control.key ? 'bg-background text-selection shadow-sm' : ''"
+                    class="inline-flex h-7 flex-none shrink-0 items-center gap-1 rounded-full px-2.5 text-xs text-muted-foreground/80 transition-colors hover:text-foreground"
+                    :class="activeQuickControl === control.key ? 'bg-background/90 text-foreground shadow-sm' : ''"
                     :aria-pressed="activeQuickControl === control.key"
                     :aria-label="`切换到${control.label}节点，${quickControlCounts[control.key] ?? 0} 台`"
                     @click="setQuickControl(control.key)"
                   >
                     <Icon :icon="control.icon" :width="12" :height="12" />
                     <span>{{ control.label }}</span>
-                    <span class="rounded-full bg-slate-500/10 px-1 text-[10px] tabular-nums text-foreground/65">
+                    <span class="rounded-full bg-slate-500/15 px-1.5 text-[10px] tabular-nums text-foreground/70">
                       {{ quickControlCounts[control.key] ?? 0 }}
                     </span>
                   </button>
@@ -482,12 +482,12 @@ const nodeCardGridClass = computed(() => {
               </div>
             </div>
             <div class="search flex min-w-0 flex-wrap gap-2 items-center justify-end pointer-events-auto max-sm:justify-start xl:ml-auto">
-              <div v-if="homeTools.length && appStore.homeAdvancedToolsVisible" class="flex h-8 items-center gap-1 rounded-md bg-background/50 p-0.5 backdrop-blur-xs">
+              <div v-if="homeTools.length && appStore.homeAdvancedToolsVisible" class="flex h-8 items-center gap-1 rounded-full border border-white/10 bg-background/40 p-0.5 backdrop-blur-xl">
                 <Button
                   v-for="tool in homeTools" :key="tool.key"
                   variant="ghost" size="icon"
-                  class="size-7 rounded-sm text-muted-foreground shadow-none hover:bg-background/60"
-                  :class="[activeHomeTool === tool.key ? '!text-selection !bg-background' : '']"
+                  class="size-7 rounded-full text-muted-foreground shadow-none hover:bg-background/60"
+                  :class="[activeHomeTool === tool.key ? '!text-foreground !bg-background/90' : '']"
                   :aria-label="`${tool.label}：${tool.description}`"
                   :aria-pressed="activeHomeTool === tool.key"
                   :title="tool.description"
@@ -499,16 +499,16 @@ const nodeCardGridClass = computed(() => {
 
               <Button
                 variant="outline" size="icon" aria-label="卡片视图"
-                class="w-8 h-8 border-none bg-background/50 backdrop-blur-xs shadow-none hover:bg-background/60 rounded-md"
-                :class="[appStore.nodeViewMode === 'card' ? '!text-selection !bg-background' : '']"
+                class="h-8 w-8 rounded-full border-white/10 bg-background/40 backdrop-blur-xl shadow-none hover:bg-background/60"
+                :class="[appStore.nodeViewMode === 'card' ? '!bg-background/90 !text-foreground' : '']"
                 @click="setNodeViewMode('card')"
               >
                 <Icon icon="tabler:layout-grid" :width="14" :height="14" />
               </Button>
               <Button
                 variant="outline" size="icon" aria-label="列表视图"
-                class="w-8 h-8 border-none bg-background/50 backdrop-blur-xs shadow-none hover:bg-background/60 rounded-md"
-                :class="[appStore.nodeViewMode === 'list' ? '!text-selection !bg-background' : '']"
+                class="h-8 w-8 rounded-full border-white/10 bg-background/40 backdrop-blur-xl shadow-none hover:bg-background/60"
+                :class="[appStore.nodeViewMode === 'list' ? '!bg-background/90 !text-foreground' : '']"
                 @click="setNodeViewMode('list')"
               >
                 <Icon icon="tabler:table" :width="14" :height="14" />

@@ -24,28 +24,104 @@ interface UseNodePingDisplayOptions {
 
 const EMPTY_PING_BAR_COUNT = 20
 
-function getLatencyToneClass(latency: number): string {
+type PingToneLevel = 1 | 2 | 3 | 4 | 5
+
+function getLatencyToneLevel(latency: number): PingToneLevel {
   if (latency <= 60)
-    return 'bg-signal-1'
+    return 1
   if (latency <= 100)
-    return 'bg-signal-2'
+    return 2
   if (latency <= 160)
-    return 'bg-signal-3 ping-signal-pattern-2'
+    return 3
   if (latency <= 200)
-    return 'bg-signal-4 ping-signal-pattern-3'
-  return 'bg-signal-5 ping-signal-pattern-4'
+    return 4
+  return 5
+}
+
+function getLossToneLevel(loss: number): PingToneLevel {
+  if (loss <= 1)
+    return 1
+  if (loss <= 3)
+    return 2
+  if (loss <= 6)
+    return 3
+  if (loss <= 9)
+    return 4
+  return 5
+}
+
+function toneBarClass(level: PingToneLevel): string {
+  switch (level) {
+    case 1:
+      return 'bg-signal-1'
+    case 2:
+      return 'bg-signal-2'
+    case 3:
+      return 'bg-signal-3 ping-signal-pattern-2'
+    case 4:
+      return 'bg-signal-4 ping-signal-pattern-3'
+    default:
+      return 'bg-signal-5 ping-signal-pattern-4'
+  }
+}
+
+function toneTextClass(level: PingToneLevel): string {
+  switch (level) {
+    case 1:
+      return 'text-signal-1'
+    case 2:
+      return 'text-signal-2'
+    case 3:
+      return 'text-signal-3'
+    case 4:
+      return 'text-signal-4'
+    default:
+      return 'text-signal-5'
+  }
+}
+
+function toneDotClass(level: PingToneLevel): string {
+  switch (level) {
+    case 1:
+      return 'bg-signal-1'
+    case 2:
+      return 'bg-signal-2'
+    case 3:
+      return 'bg-signal-3'
+    case 4:
+      return 'bg-signal-4'
+    default:
+      return 'bg-signal-5'
+  }
+}
+
+function getLatencyToneClass(latency: number): string {
+  return toneBarClass(getLatencyToneLevel(latency))
 }
 
 function getLossToneClass(loss: number): string {
-  if (loss <= 1)
-    return 'bg-signal-1'
-  if (loss <= 3)
-    return 'bg-signal-2'
-  if (loss <= 6)
-    return 'bg-signal-3 ping-signal-pattern-2'
-  if (loss <= 9)
-    return 'bg-signal-4 ping-signal-pattern-3'
-  return 'bg-signal-5 ping-signal-pattern-4'
+  return toneBarClass(getLossToneLevel(loss))
+}
+
+export function getLatencyToneTextClass(latency: number): string {
+  return toneTextClass(getLatencyToneLevel(latency))
+}
+
+export function getLatencyToneDotClass(latency: number): string {
+  return toneDotClass(getLatencyToneLevel(latency))
+}
+
+export function getLossToneTextClass(loss: number): string {
+  return toneTextClass(getLossToneLevel(loss))
+}
+
+export function latestFiniteValue(values: Array<number | null | undefined>): number | null {
+  for (let index = values.length - 1; index >= 0; index--) {
+    const value = values[index]
+    if (typeof value === 'number' && Number.isFinite(value))
+      return value
+  }
+  return null
 }
 
 export function buildEmptyPingBars(tooltip: string, keyPrefix = 'latency'): NodePingBar[] {
@@ -133,6 +209,33 @@ export function useNodePingDisplay(
     return bars.length ? bars : buildEmptyPingBars(emptyBarsTooltip.value, 'loss')
   })
 
+  const latencyPoints = computed(() => pingStats.history.value.map(point => point.latency))
+
+  const latestLatency = computed(() => {
+    const latest = latestFiniteValue(latencyPoints.value)
+    if (latest !== null)
+      return latest
+    return pingStats.hasData.value ? pingStats.avgLatency.value : null
+  })
+
+  const latencyToneClass = computed(() => {
+    if (latestLatency.value === null)
+      return 'text-muted-foreground'
+    return getLatencyToneTextClass(latestLatency.value)
+  })
+
+  const latencyDotClass = computed(() => {
+    if (latestLatency.value === null)
+      return 'bg-muted-foreground/40'
+    return getLatencyToneDotClass(latestLatency.value)
+  })
+
+  const lossToneClass = computed(() => {
+    if (!pingStats.hasData.value)
+      return 'text-muted-foreground'
+    return getLossToneTextClass(pingStats.avgLoss.value)
+  })
+
   const latencyDisplay = computed(() => {
     if (pingStats.hasData.value)
       return `${Math.round(pingStats.avgLatency.value)} ms`
@@ -178,6 +281,11 @@ export function useNodePingDisplay(
     loading: pingStats.loading,
     latencyRenderBars,
     lossRenderBars,
+    latencyPoints,
+    latestLatency,
+    latencyToneClass,
+    latencyDotClass,
+    lossToneClass,
     latencyDisplay,
     lossDisplay,
     latencyPanelTooltip,

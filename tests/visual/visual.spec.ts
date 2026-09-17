@@ -26,13 +26,12 @@ async function expectNodeMetricIcons(page: Page): Promise<void> {
     await expect(page.locator(`[data-node-metric-icon="${metric}"]`).first()).toBeVisible()
 }
 
-async function expectNodePingBars(page: Page): Promise<void> {
+async function expectNodePingSparkline(page: Page): Promise<void> {
   const card = page.getByRole('button', { name: '查看节点 主控-洛杉矶 详情' })
-  for (const metric of ['latency', 'loss']) {
-    const bars = card.locator(`[data-node-ping-bars="${metric}"]`)
-    await expect(bars).toBeVisible()
-    await expect.poll(() => bars.evaluate(element => element.getBoundingClientRect().width)).toBeGreaterThan(0)
-  }
+  const sparkline = card.locator('[data-node-ping-sparkline="latency"]')
+  await expect(sparkline).toBeVisible()
+  await expect.poll(() => sparkline.evaluate(element => element.getBoundingClientRect().width)).toBeGreaterThan(0)
+  await expect(card.locator('[data-node-ping-loss="loss"]')).toBeVisible()
 }
 
 test('home light desktop', async ({ page }) => {
@@ -40,7 +39,7 @@ test('home light desktop', async ({ page }) => {
   await installKomariFixture(page)
   await openStablePage(page)
   await expectNodeMetricIcons(page)
-  await expectNodePingBars(page)
+  await expectNodePingSparkline(page)
   await expect(page).toHaveScreenshot('home-light-desktop.png', { fullPage: false })
 })
 
@@ -199,27 +198,19 @@ test('three-net ping replaces summary bars with selected tasks', async ({ page }
 
   const card = page.getByRole('button', { name: '查看节点 主控-洛杉矶 详情' })
   await expect(card.locator('[data-three-net-ping]')).toBeVisible()
-  await expect(card.locator('[data-node-ping-bars="latency"]')).toHaveCount(0)
+  await expect(card.locator('[data-node-ping-sparkline="latency"]')).toHaveCount(0)
   await expect(card.getByText('广东电信', { exact: true })).toBeVisible()
   await expect(card.getByText('广东移动', { exact: true })).toBeVisible()
   await expect(card.getByText('广东联通', { exact: true })).toBeVisible()
 
   for (const taskId of [1, 3, 4]) {
-    for (const metric of ['latency', 'loss']) {
-      const bars = card.locator(`[data-node-ping-bars="task-${taskId}-${metric}"]`)
-      await expect(bars).toBeVisible()
-      await expect.poll(() => bars.evaluate(element => element.getBoundingClientRect().width)).toBeGreaterThan(0)
-    }
+    const sparkline = card.locator(`[data-node-ping-sparkline="task-${taskId}"]`)
+    await expect(sparkline).toBeVisible()
+    await expect.poll(() => sparkline.evaluate(element => element.getBoundingClientRect().width)).toBeGreaterThan(0)
+    await expect(card.locator(`[data-node-ping-loss="task-${taskId}"]`)).toContainText('丢包')
   }
 
-  const lossTooltips = card.locator('[data-node-ping-bars="task-1-loss"] [role="tooltip"]')
-  await expect.poll(async () => {
-    const texts = await lossTooltips.allTextContents()
-    return texts.some((text) => {
-      const match = text.match(/(\d+(?:\.\d+)?)%/)
-      return Boolean(match && Number(match[1]) > 0)
-    })
-  }).toBeTruthy()
+  await expect(card.locator('[data-node-ping-loss="task-1"]')).toContainText(/[1-9]/)
 })
 
 test('node card expiry uses red through 5 days and yellow through 10 days', async ({ page }) => {

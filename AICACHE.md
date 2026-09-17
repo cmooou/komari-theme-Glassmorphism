@@ -12,14 +12,40 @@
 
 ## 当前任务
 
-- 状态：in-progress，以独立 short `GlassmorphismTS` 重新上架主题商店；版本 3.3.13。
-- 原因：#105 因 `Glassmorphism` 已被 sanrokamlan-prog 占用而关闭。
-- 下一步：发 v3.3.13 Release，编辑并 reopen https://github.com/komari-monitor/theme-market/issues/105 ，预览图改 raw 直链。
-- 提交：`7003fdf9dbfa99aa5a4623e25f68c1fc4473a56b` 已推送 `main`。
-- Release：https://github.com/towersip/komari-theme-Glassmorphism/releases/tag/v3.3.12 （正式发布，非 draft / prerelease；target 与 tag 均为该提交）。
-- 资产：`komari-theme-Glassmorphism-build-7003fdf.zip`，5,150,020 bytes，SHA-256 `59EF6706EF35B9BA8406C0474F11D9CC8A0DC9D4951234A769D908E38DA76B2F`；顶层 `komari-theme.json` / `preview.png` / `dist/`；版本 3.3.12；含三网设置。
-- 范围：三网延迟 + Issue #55 iOS 网页缩放安全区。
-- 不做：不升 3.3.13。
+- 状态：done，文档改成自己用、按需改，并注明原项目地址。
+- 文档：README、AIAGENTREADME、AGENTS.md、CLAUDE.md、src/AGENTS.md、docs/Architecture.md。
+- 原项目：https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism
+- 本仓库：https://github.com/towersip/komari-theme-Glassmorphism
+- 不做：不升版本、不提交。
+
+## 上一任务
+
+- 状态：done，已删除主题不再需要的旧 `public/admin-app` 及同步脚本。
+- 删除：`public/admin-app/`、`scripts/sync-komari-admin.ts`、`scripts/assets/glass-admin.css`、`package.json` 的 `sync:admin`、无引用的 `components.d.ts`。
+- 保留：`public/images/`、`public/sw.js`、`public/favicon.ico`、ZIP 仍忽略 `dist/admin-app/**`。
+- 验证：`vue-tsc --build`、`bun run build` 通过；产物无 `dist/admin-app`。
+- 不做：不升版本、不提交。
+
+## 上一任务
+
+- 状态：done，M4 首页 UI 优化（顶部统计卡 + 筛选胶囊 + 三网 Sparkline）已落地，未提交未发布。
+- 目标：不改核心数据流，把首页统计卡、筛选栏和节点三网延迟改成毛玻璃 + Sparkline 展示。
+- 实现：顶部 6 卡与节点卡统一玻璃样式；内存/硬盘细进度条；价值/流量/上下行用会话滚动采样 Sparkline；三网小方块改为真实探测历史折线；筛选改为胶囊高亮；多背景 URL 仅在进入/刷新时随机，数据刷新不换图。
+- 验证：`vue-tsc --build`、`git diff --check`、`bun run build` 通过；本机 `http://localhost:5173/` 代理真实数据：桌面 6 卡一行、三列节点、三网 Sparkline、US 筛选/列表/Ping 弹窗正常；390 宽无横向溢出。`bun run lint` 仍因本机缺少 `Object.groupBy` 未作为通过证据。
+- 不做：不升版本、不提交、不发 Release，除非用户要求。视觉回归截图未更新（布局已变，CI 会 diff）。
+
+## 上一任务
+
+- 状态：waiting-merge，独立短名称 `GlassmorphismTS` 已作为另一个主题提交商店，等待目录 PR 合并。
+- 原因：#105 因 `Glassmorphism` 已被 sanrokamlan-prog 占用而关闭；作者无法 reopen（Action 以 not_planned 关闭，API 422）。
+- 身份：`name` Komari Glassmorphism TS；`short` GlassmorphismTS；`version` 3.3.13；提交 `3e3b7a77881ccb3cb2f55130e1a3351399ff4328`。
+- Release：https://github.com/towersip/komari-theme-Glassmorphism/releases/tag/v3.3.13 （正式发布，非 draft / prerelease）。
+- 资产：`komari-theme-Glassmorphism-build-3e3b7a7.zip`，5,149,961 bytes，SHA-256 `00744417297d864515a3ae054f055254c609ca7f74600f6709625fe39ee0868a`。
+- 商店提交：https://github.com/komari-monitor/theme-market/issues/106 自动检查通过。
+- 上架 PR：https://github.com/komari-monitor/theme-market/pull/107 （`feat: add GlassmorphismTS theme`）。
+- 旧 Issue：https://github.com/komari-monitor/theme-market/issues/105 已改标题/预览图并留言指向 #106，仍保持关闭。
+- 下一步：等商店维护者合并 PR #107；合并后 #106 会自动关闭，目录才会出现新主题。
+- 不做：不 force-push；不改回 `Glassmorphism` short。
 
 - 状态：done，v3.3.12 code review 修复已落地：Safari aA 用 layout/visual 短边比检测缩放；三网 Metric 丢包柱按 taskId 过滤 `metricLossPoints`；顶栏改回 `z-10`；inset 带 `env()` 回退。
 - 验证：`vue-tsc --build` 与 `git diff --check` 通过；Playwright 系统 Chrome 4/4（2 个原 iOS + 缩放系数 2 + 三网替换/丢包柱）。
@@ -118,6 +144,46 @@
 - 不做：不把 Glassmorphism 默认主题替换混入计费 PR #604；不发布测试构建为正式 Release；不构建 Windows 包。
 
 ## 执行日志
+
+### 2026-09-17 文档标明自用 fork
+
+- README / agent 手册改成自己用、按需改；原项目地址为 `sanrokamlan-prog/komari-theme-Glassmorphism`；基座仍注明 Tokinx / komari-theme-emerald。
+
+### 2026-09-17 删除旧 admin-app
+
+- 移除嵌入式 komari-web 构建与 `bun run sync:admin`；管理端继续由 Komari 1.5 内置前端提供。
+- 一并删除未接入 tsconfig 的 `components.d.ts`。打包仍忽略 `admin-app/**`，防止误拷回后进 ZIP。
+
+### 2026-09-17 顶部统计卡恢复原样
+
+- `NodeGeneralCards.vue` 回退到改版前：标签+右上角图标+数值，无进度条、无 Sparkline。地球布局保持左侧卡、右侧球。
+
+### 2026-09-17 地球改回原位置
+
+- 首页统计区不再把地球放到 6 卡下方全宽；恢复 12 列网格：桌面卡占左 6 列（3×2），地球占右 6 列；贴图地球仍在卡下方。
+
+### 2026-09-17 移除 mock 测试数据
+
+- 删除 `scripts/komari-mock-plugin.ts`、`homepage-dataset.ts`、`homepage-cases.json`、`homepage-data.spec.ts`；`package.json` 去掉 `dev:mock`；Vite 不再挂 mock 插件。
+- 视觉夹具 `komari.ts` 恢复为原有固定节点，不再走 homepageCases。
+
+### 2026-09-17 离线提示与标签颜色
+
+- 节点卡 `overflow: hidden` 把警告图标的 CSS Tooltip 裁掉；改为卡片可见溢出、内容区裁剪遮罩，提示放到图标下方。
+- 卡片原先只渲染 `parseTags().text` 且用灰色 Badge；现按 `tag.hex` 着色。解析同时接受分号和逗号，`core<jade>,visual<blue>` 会拆成两个标签。
+
+### 2026-09-17 首页 UI 测试数据集
+
+- 已废弃：mock 数据集与 `dev:mock` 已删除，改回真实接口预览。
+
+### 2026-09-17 首页统计卡 / 三网 Sparkline UI
+
+- 顶部 6 张总览卡改为与节点卡相同的毛玻璃；内存/硬盘显示用量+百分比+细进度条；剩余价值/累计流量/实时上下行底部加轻量 SVG Sparkline（会话滚动采样，非随机）。
+- 地球改为统计卡下方全宽，桌面 `lg` 起 6 卡一行，平板 3 列，手机 2 列。
+- 分组和快捷筛选改为胶囊条，选中态 `data-active:!bg-white/20`。
+- 节点卡延迟小方块改为：线路名 + 当前 ms + 真实历史 Sparkline + 丢包率；阈值沿用 signal-1~5。列表视图小方块未改。
+- 背景：亮/暗 URL 支持多张（换行/竖线/分号），按会话随机一次；CSS cover/center/no-repeat/fixed。
+- 验证：`vue-tsc --build`、`bun run build` 通过；本机首页桌面/US 筛选/列表/Ping 弹窗/390 宽均已点选确认。
 
 ### 2026-09-17 v3.3.12 节点卡片三网延迟
 

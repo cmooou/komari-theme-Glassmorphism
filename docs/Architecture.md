@@ -1,5 +1,7 @@
 # v3 Architecture
 
+Personal-use fork at [towersip/komari-theme-Glassmorphism](https://github.com/towersip/komari-theme-Glassmorphism). Origin: [sanrokamlan-prog/komari-theme-Glassmorphism](https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism). Original theme author: [Tokinx](https://github.com/Tokinx); base: [komari-theme-emerald](https://github.com/Tokinx/komari-theme-emerald). Do not assume it tracks upstream.
+
 Komari Theme Glassmorphism v3 moves new code toward a layered architecture:
 
 ```text

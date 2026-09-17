@@ -307,14 +307,14 @@ export function getTagColorHex(color: TagColor): string {
 
 /**
  * 解析标签字符串为标签列表
- * @param tags 标签字符串，用分号分隔
+ * @param tags 标签字符串，用分号或逗号分隔，单项支持 `文本<颜色>`
  * @returns 标签数组
  */
 export function parseTags(tags: string | undefined): Array<{ text: string, color: TagColor, hex: string }> {
   if (!tags || tags.trim() === '')
     return []
 
-  const tagList = tags.split(';').map(tag => tag.trim()).filter(Boolean)
+  const tagList = tags.split(/[;；,，]/).map(tag => tag.trim()).filter(Boolean)
 
   return tagList.map((tag, index) => {
     const { text, color } = parseTagWithColor(tag)

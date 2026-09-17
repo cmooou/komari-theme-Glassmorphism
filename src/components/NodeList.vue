@@ -409,7 +409,7 @@ function buildNodeMetadataItems(node: NodeData): NodeMetadataItem[] {
           <div
             v-for="({ data: node, index }) in renderedRows"
             :key="getRowTransitionKey(node)"
-            class="flex flex-col relative h-16 min-h-16 max-h-16 overflow-hidden justify-center px-2.5 cursor-pointer bg-background/40 rounded-lg backdrop-blur-sm shadow-[0_0_0_2px] shadow-transparent hover:shadow-slate-500/10 hover:bg-background/70 transition-all"
+            class="flex flex-col relative h-16 min-h-16 max-h-16 overflow-visible justify-center px-2.5 cursor-pointer bg-background/40 rounded-lg backdrop-blur-sm shadow-[0_0_0_2px] shadow-transparent hover:shadow-slate-500/10 hover:bg-background/70 transition-all"
             :class="[!node.online && '!shadow-red-600/10']"
             :style="getRowTransitionStyle(index)"
             role="button"
@@ -452,10 +452,10 @@ function buildNodeMetadataItems(node: NodeData): NodeMetadataItem[] {
                     <DataTooltip
                       v-if="getNodeMessage(node)"
                       :content="getNodeMessageTooltip(node)"
-                      placement="top"
+                      placement="bottom"
                       as="span"
-                      class="inline-flex shrink-0 text-amber-500"
-                      content-class="w-56 whitespace-pre-line leading-snug text-left"
+                      class="relative z-20 inline-flex shrink-0 cursor-help text-amber-500"
+                      content-class="z-50 w-56 whitespace-pre-line leading-snug text-left"
                     >
                       <Icon icon="tabler:alert-triangle-filled" width="13" height="13" aria-label="节点消息" />
                     </DataTooltip>

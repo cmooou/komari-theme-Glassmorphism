@@ -17,7 +17,15 @@
 
 ## 1. 项目是什么
 
-**Komari Glassmorphism** 是一个 Komari Monitor 主题，使用 Vue 3 + Vite 构建。它的发布产物是 Komari 可以导入的 zip 包，不是普通 Web App 部署包。
+**Komari Glassmorphism TS**（本仓库 `towersip/komari-theme-Glassmorphism`）是一个 Komari Monitor 主题，使用 Vue 3 + Vite 构建。它的发布产物是 Komari 可以导入的 zip 包，不是普通 Web App 部署包。
+
+从原项目 fork 过来给自己用，按自己的需要改，不必对齐或合入上游。Issue / PR / Release 丢本仓库就行。
+
+| 角色 | 地址 |
+| --- | --- |
+| 本仓库 | https://github.com/towersip/komari-theme-Glassmorphism |
+| 原项目（fork 来源） | https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism |
+| 原始主题作者 / 基座 | [Tokinx](https://github.com/Tokinx) / [komari-theme-emerald](https://github.com/Tokinx/komari-theme-emerald) |
 
 关键事实：
 
@@ -473,6 +481,7 @@ HomeView tool button
 - 把 release version 放到 package.json。
 - 用本地 build 成功代替 Release 检查。
 - 修改 default card size，让 `mini` 替代或缩水 `compact`。
+- 默认 rebase / merge 原项目 [sanrokamlan-prog/komari-theme-Glassmorphism](https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism)。这边是给自己用的 fork，别当正式同步上游。
 
 ## 18. 最小交接清单
 

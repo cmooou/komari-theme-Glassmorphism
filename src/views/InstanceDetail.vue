@@ -162,7 +162,7 @@ const providerDisplay = computed(() => {
 })
 
 // 节点自定义标签
-const customTags = computed(() => parseTags(data.value?.tags).map(t => t.text))
+const customTags = computed(() => parseTags(data.value?.tags))
 
 // 该节点支持的 IP 协议（仅显示"支持"，不暴露具体 IP）
 const ipSupport = computed(() => {
@@ -505,10 +505,11 @@ const metricCards = computed<MetricCard[]>(() => appStore.detailMetricCardOrder.
         <!-- 节点自定义标签 -->
         <div v-if="customTags.length" class="flex flex-wrap gap-1">
           <Badge
-            v-for="(tag, i) in customTags" :key="i" variant="outline"
-            class="!text-[11px] rounded text-muted-foreground border-muted-foreground/15 px-1.5 py-0"
+            v-for="(tag, i) in customTags" :key="`${tag.text}-${i}`" variant="outline"
+            class="!text-[11px] rounded px-1.5 py-0"
+            :style="{ color: tag.hex, borderColor: `${tag.hex}66`, backgroundColor: `${tag.hex}1f` }"
           >
-            {{ tag }}
+            {{ tag.text }}
           </Badge>
         </div>
         <div class="ml-auto flex h-8 shrink-0 items-center gap-1 rounded-md bg-background/50 p-0.5 backdrop-blur-xs">

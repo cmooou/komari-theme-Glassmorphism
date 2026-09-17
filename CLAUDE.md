@@ -13,7 +13,13 @@ This file is the Claude Code entrypoint for this repository. The full AI/develop
 
 ## What this project is
 
-Komari Glassmorphism is a Komari Monitor theme built with Vue 3 + Vite. The release artifact is a Komari-importable zip package, not a generic deployed web app.
+Komari Glassmorphism TS is a Komari Monitor theme built with Vue 3 + Vite. The release artifact is a Komari-importable zip package, not a generic deployed web app.
+
+Personal-use fork. Change it to fit this repo owner's needs; do not treat it as a formal upstream sync.
+
+- This repo: https://github.com/towersip/komari-theme-Glassmorphism
+- Origin: https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism
+- Original author / base: https://github.com/Tokinx/komari-theme-emerald
 
 Key release facts:
 

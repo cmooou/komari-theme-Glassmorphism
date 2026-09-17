@@ -181,9 +181,10 @@ onUnmounted(() => {
   inset: 0;
   overflow: hidden;
   background-image: url('/images/default-background-v2.webp');
-  background-position: center bottom;
+  background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
+  background-attachment: fixed;
   filter: saturate(1.12) contrast(1.02);
   transform: scale(1.01);
   transform-origin: center;
@@ -195,7 +196,7 @@ onUnmounted(() => {
 
 @media (max-width: 768px) {
   .default-background {
-    background-position: 50% 78%;
+    background-position: center;
     transform: scale(1.02);
   }
 }
@@ -224,6 +225,7 @@ onUnmounted(() => {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 .background-video {

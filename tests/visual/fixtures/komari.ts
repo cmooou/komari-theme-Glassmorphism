@@ -68,7 +68,7 @@ function buildClients(freePriceNode = false, expiryThresholds = false) {
           ? '2026-08-04T12:00:00.000Z'
           : index === 6 ? '2026-08-02T00:00:00.000Z' : '2027-07-25T00:00:00.000Z',
       group: index < 6 ? '生产' : '测试,边缘',
-      tags: index % 2 === 0 ? 'core<jade>,visual<blue>' : 'edge<orange>',
+      tags: index % 2 === 0 ? 'core<jade>;visual<blue>' : 'edge<orange>',
       hidden: false,
       traffic_limit: index === 6 ? 2 * TIB : 20 * TIB,
       traffic_limit_type: 'sum',
@@ -243,9 +243,17 @@ function jsonRpcResult(id: unknown, result: unknown) {
   return { jsonrpc: '2.0', id, result }
 }
 
-async function handleRpc(route: Route, clientFixtures = clients, options: VisualFixtureOptions = {}): Promise<void> {
-  const payload = route.request().postDataJSON() as { id: unknown, method: string, params?: Record<string, unknown> }
-  const uuid = typeof payload.params?.uuid === 'string' ? payload.params.uuid : uuidFor(0)
+export function resolveKomariRpc(
+  method: string,
+  params: Record<string, unknown> | undefined,
+  options: VisualFixtureOptions = {},
+  clientFixtures = clients,
+): unknown {
+  const uuid = typeof params?.uuid === 'string'
+    ? params.uuid
+    : typeof params?.entity_id === 'string'
+      ? params.entity_id
+      : uuidFor(0)
   const pingTasks = options.pingTaskOrdering
     ? [
         { id: 30, name: '浙江移动', interval: 60, loss: 0, weight: 0 },
@@ -268,94 +276,81 @@ async function handleRpc(route: Route, clientFixtures = clients, options: Visual
     time: new Date(Date.parse(FIXED_NOW) - (47 - index) * 75_000).toISOString(),
     value: index % 17 === 0 ? -1 : 76 + index + task.id,
   })))
-  let result: unknown
 
-  switch (payload.method) {
+  switch (method) {
     case 'rpc.ping':
-      result = 'pong'
-      break
+      return 'pong'
     case 'common:getNodes':
-      result = clientFixtures
-      break
+      return clientFixtures
     case 'common:getNodesLatestStatus':
-      result = options.threeNetPing ? buildStatuses(true) : statuses
-      break
+      return options.threeNetPing ? buildStatuses(true) : statuses
     case 'common:getNodeRecentStatus':
-      result = { count: 48, records: buildRecords(uuid) }
-      break
+      return { count: 48, records: buildRecords(uuid) }
     case 'common:getRecords':
-      result = payload.params?.type === 'ping'
-        ? { count: 48, records: pingRecords, tasks: pingTasks }
+      return params?.type === 'ping'
+        ? { count: pingRecords.length, records: pingRecords, tasks: pingTasks }
         : { count: 48, records: buildRecords(uuid) }
-      break
     case 'public:getClientRecentRecords':
-      result = buildRecords(uuid)
-      break
+      return buildRecords(uuid)
     case 'public:getRecordsByUUID':
-      result = { count: 48, records: buildRecords(uuid), load_type: 'all', has_gpu_data: false }
-      break
+      return { count: 48, records: buildRecords(uuid), load_type: 'all', has_gpu_data: false }
     case 'public:getPingRecords':
-      result = { count: 48, records: pingRecords, tasks: pingTasks }
-      break
+      return { count: pingRecords.length, records: pingRecords, tasks: pingTasks }
     case 'public:getPublicPingTasks':
-      result = pingTasks
-      break
+      return pingTasks
     case 'public:listMetricDefinitions':
-      result = METRIC_KEYS.map(name => ({ name, description: name, type: 'gauge', retention_days: 30 }))
-      break
+      return METRIC_KEYS.map(name => ({ name, description: name, type: 'gauge', retention_days: 30 }))
     case 'public:queryMetrics':
-      result = buildMetricResponse(payload.params ?? {}, options, pingTasks)
-      break
+      return buildMetricResponse(params ?? {}, options, pingTasks)
     case 'public:getPingMetricStats':
-      result = options.pingTaskOrdering || options.threeNetPing
-        ? {
-            start: FIXED_NOW,
-            end: FIXED_NOW,
-            interval_seconds: 60,
-            stats: metricPingTasks.map(task => ({
-              entity_id: uuid,
-              task_id: String(task.id),
-              name: task.name,
-              interval: task.interval,
-              tags: { task_id: String(task.id), task_name: task.name },
-              total: 48,
-              valid: options.threeNetPing ? 45 : 48,
-              loss: options.threeNetPing ? 6.25 : 0,
-              loss_approximate: false,
-              min: 40 + task.id,
-              max: 120 + task.id,
-              avg: 80 + task.id,
-              latest: 90 + task.id,
-            })),
-            count: metricPingTasks.length,
-          }
-        : { start: FIXED_NOW, end: FIXED_NOW, interval_seconds: 60, stats: [], count: 0 }
-      break
+      return options.pingTaskOrdering || options.threeNetPing
+          ? {
+              start: FIXED_NOW,
+              end: FIXED_NOW,
+              interval_seconds: 60,
+              stats: metricPingTasks.map(task => ({
+                entity_id: uuid,
+                task_id: String(task.id),
+                name: task.name,
+                interval: task.interval,
+                tags: { task_id: String(task.id), task_name: task.name },
+                total: 48,
+                valid: options.threeNetPing ? 45 : 48,
+                loss: options.threeNetPing ? 6.25 : 0,
+                loss_approximate: false,
+                min: 40 + task.id,
+                max: 120 + task.id,
+                avg: 80 + task.id,
+                latest: 90 + task.id,
+              })),
+              count: metricPingTasks.length,
+            }
+          : { start: FIXED_NOW, end: FIXED_NOW, interval_seconds: 60, stats: [], count: 0 }
     case 'public:getNodesInformation':
-      result = Object.values(clientFixtures)
-      break
+      return Object.values(clientFixtures)
     case 'public:getMe':
-      result = { logged_in: false }
-      break
+      return { logged_in: false }
     case 'public:getVersion':
     case 'common:getBackendVersion':
     case 'rpc.getVersion':
-      result = { version: '1.2.6-visual', hash: 'visual' }
-      break
+      return { version: '1.2.6-visual', hash: 'visual' }
     default:
-      result = null
+      return null
   }
+}
 
+async function handleRpc(route: Route, clientFixtures = clients, options: VisualFixtureOptions = {}): Promise<void> {
+  const payload = route.request().postDataJSON() as { id: unknown, method: string, params?: Record<string, unknown> }
   await route.fulfill({
     contentType: 'application/json',
-    body: JSON.stringify(jsonRpcResult(payload.id, result)),
+    body: JSON.stringify(jsonRpcResult(payload.id, resolveKomariRpc(payload.method, payload.params, options, clientFixtures))),
   })
 }
 
 export async function installKomariFixture(page: Page, options: VisualFixtureOptions = {}): Promise<void> {
   const clientFixtures = options.freePriceNode || options.expiryThresholds
-    ? buildClients(options.freePriceNode, options.expiryThresholds)
-    : clients
+      ? buildClients(options.freePriceNode, options.expiryThresholds)
+      : clients
   const settings = {
     themeMode: options.dark ? 'dark' : 'light',
     dataUpdateInterval: 60,

@@ -2,9 +2,9 @@
 
 # 🌌 Komari Glassmorphism
 
-## 给 Komari Monitor 的一套「玻璃拟态 · 运维驾驶舱」主题
+## 给自己用的 Komari 毛玻璃主题
 
-从好看的监控首页，逐步成长为好用、可配置、适合长期运行的 Komari 主题。
+fork 过来按自己的使用习惯改，需要什么补什么。
 
 ![Version](https://img.shields.io/github/v/release/towersip/komari-theme-Glassmorphism?style=for-the-badge&label=release&color=10b981)
 ![Vue](https://img.shields.io/badge/Vue-3-42b883?style=for-the-badge&logo=vue.js)
@@ -17,9 +17,24 @@
 **[🚀 安装](#-安装--升级)** ·
 **[✨ 功能](#-节点详情页全面升级)** ·
 **[⚙️ 设置](#️-主题设置)** ·
-**[🛠️ 开发](#️-本地开发)**
+**[🛠️ 开发](#️-本地开发)** ·
+**[🌿 来源](#-项目来源)**
 
 </div>
+
+---
+
+## 🌿 项目来源
+
+从原项目 fork 过来给自己用的，按自己的需要改，不跟上游同步。
+
+原项目：  
+https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism
+
+本仓库：  
+https://github.com/towersip/komari-theme-Glassmorphism
+
+最早的毛玻璃基座是 [Tokinx](https://github.com/Tokinx) 的 [emerald](https://github.com/Tokinx/komari-theme-emerald)。
 
 ---
 
@@ -37,6 +52,8 @@
 
 | 项目     | 说明                                                      |
 | :------- | :-------------------------------------------------------- |
+| 本仓库   | [towersip/komari-theme-Glassmorphism](https://github.com/towersip/komari-theme-Glassmorphism)，自己用，按需改 |
+| 原项目   | [sanrokamlan-prog/komari-theme-Glassmorphism](https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism) |
 | 当前版本 | **v3.3.13**                                               |
 | 主题定位 | Komari Monitor 可导入 zip 主题，不是普通 Web App 部署包   |
 | 视觉风格 | 毛玻璃卡片、动态背景、浅色 / 深色 / 北京时间自动日夜模式  |
@@ -44,7 +61,7 @@
 | 高级工具 | 拓扑、性价比、健康摘要、快照导出、访客安全审计            |
 | 发布产物 | `komari-theme-Glassmorphism-build-<short-sha>.zip`        |
 
-> 好看只是外壳。v3 真正的重点，是把 Metric、Ping、流量、费用、健康分析和运维工具整合成日常真的会打开来看的监控面板。
+> 按自己盯节点、Ping、流量、费用的习惯改，不是给所有人做的产品。
 
 ---
 
@@ -811,14 +828,13 @@ dist/
 
 ## ⭐ Support
 
-如果这个项目帮助到了你，欢迎：
+主要给自己用。你也可以 star、fork，有问题可以提 Issue，不一定会按别人的需求改。
 
-- ⭐ Star 本项目
-- 🍴 Fork 并贡献代码
-- 💬 提交 Issue 或 Feature Request
-- 📢 分享给更多 Komari 用户
+- ⭐ [本仓库](https://github.com/towersip/komari-theme-Glassmorphism)
+- 🍴 需要自己改就 fork 走
+- 💬 Issue 可以丢这边
 
-你的每一个 Star，都是继续维护更新的动力。
+通用版本请看 [原项目](https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism)。
 
 ---
 
@@ -832,7 +848,7 @@ dist/
 
 ## 🙏 致谢
 
-感谢原始主题作者 **Tokinx**，感谢 [Komari](https://github.com/komari-monitor/komari)、[Komari Naive](https://github.com/tonyliuzj/komari-naive)、Vue、Vite、reka-ui、Tailwind CSS，以及所有反馈 Issue、提交 PR 和分享建议的朋友。
+fork 自 [原项目](https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism)，给自己用。毛玻璃基座是 [Tokinx](https://github.com/Tokinx) 的 [emerald](https://github.com/Tokinx/komari-theme-emerald)。也谢谢 [Komari](https://github.com/komari-monitor/komari)、[Komari Naive](https://github.com/tonyliuzj/komari-naive)、Vue、Vite、reka-ui、Tailwind CSS。
 
 ## 📄 License
 

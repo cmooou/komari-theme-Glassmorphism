@@ -6,8 +6,11 @@ For the complete AI/developer manual, read [AIAGENTREADME.md](AIAGENTREADME.md).
 
 ## Snapshot
 
-- Updated: 2026-07-12
+- Updated: 2026-09-17
 - Branch: `main`
+- Repo: [towersip/komari-theme-Glassmorphism](https://github.com/towersip/komari-theme-Glassmorphism) — personal-use fork, change for own needs
+- Upstream origin: [sanrokamlan-prog/komari-theme-Glassmorphism](https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism)
+- Original theme author / base: [Tokinx/komari-theme-emerald](https://github.com/Tokinx/komari-theme-emerald)
 - App: Vue 3 + Vite + reka-ui + Tailwind CSS v4 theme for Komari Monitor
 - Package manager: `bun` >= 1.2
 - Theme manifest and version source: [komari-theme.json](komari-theme.json)
@@ -84,6 +87,7 @@ Quick placement guide:
 
 ## Safeguards
 
+- Personal-use fork. Do not sync from the origin repo unless the user asks.
 - [komari-theme.json](komari-theme.json) is the only release-version source; do not add `package.json.version`.
 - Default node card size must remain `compact`; `mini` is optional.
 - Realtime node metrics must update without page refresh; node indexes must point to Vue-reactive node objects.

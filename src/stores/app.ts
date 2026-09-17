@@ -838,6 +838,8 @@ function resolveBackgroundSource(value: unknown): string {
     return ''
 
   const source = value.trim()
+  if (!source)
+    return ''
   if (!source.toLowerCase().startsWith('local:'))
     return source
 
@@ -850,6 +852,37 @@ function resolveBackgroundSource(value: unknown): string {
     return ''
 
   return `/themes/user-assets/${segments.map(segment => encodeURIComponent(segment)).join('/')}`
+}
+
+const BACKGROUND_SOURCE_SPLIT_RE = /\n+|\s*[|;]\s*|,(?=\s*(?:https?:|\/|local:))/i
+const sessionBackgroundPicks: Record<'light' | 'dark', string> = {
+  light: '',
+  dark: '',
+}
+
+function parseBackgroundSources(value: unknown): string[] {
+  if (typeof value !== 'string')
+    return []
+
+  const sources = value
+    .split(BACKGROUND_SOURCE_SPLIT_RE)
+    .map(part => resolveBackgroundSource(part))
+    .filter(Boolean)
+
+  return [...new Set(sources)]
+}
+
+function pickSessionBackground(mode: 'light' | 'dark', sources: string[]): string {
+  if (!sources.length)
+    return ''
+
+  const current = sessionBackgroundPicks[mode]
+  if (current && sources.includes(current))
+    return current
+
+  const picked = sources[Math.floor(Math.random() * sources.length)] ?? sources[0] ?? ''
+  sessionBackgroundPicks[mode] = picked
+  return picked
 }
 
 function readColorSetting(settings: ThemeSettings, key: string, fallback: string): string {
@@ -1236,11 +1269,11 @@ const useAppStore = defineStore('app', () => {
   })
 
   const lightBackgroundUrl = computed<string>(() => {
-    return resolveBackgroundSource(themeSettings.value.lightBackgroundUrl)
+    return pickSessionBackground('light', parseBackgroundSources(themeSettings.value.lightBackgroundUrl))
   })
 
   const darkBackgroundUrl = computed<string>(() => {
-    return resolveBackgroundSource(themeSettings.value.darkBackgroundUrl)
+    return pickSessionBackground('dark', parseBackgroundSources(themeSettings.value.darkBackgroundUrl))
   })
 
   const backgroundBlur = computed<number>(() => readNumberSetting(themeSettings.value, 'backgroundBlur', 0, 0, Number.MAX_SAFE_INTEGER))

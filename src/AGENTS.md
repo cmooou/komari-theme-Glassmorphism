@@ -2,6 +2,8 @@
 
 This guide applies to [src/](./). For full project context, read [../AIAGENTREADME.md](../AIAGENTREADME.md). For current work handoff, read/update [../AICACHE.md](../AICACHE.md).
 
+This source tree is the personal-use fork [towersip/komari-theme-Glassmorphism](https://github.com/towersip/komari-theme-Glassmorphism). Origin: [sanrokamlan-prog/komari-theme-Glassmorphism](https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism). Do not default-sync upstream.
+
 ## Source-tree rule of thumb
 
 All new app code should follow:

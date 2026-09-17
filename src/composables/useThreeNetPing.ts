@@ -1,10 +1,13 @@
 import type { MaybeRefOrGetter } from 'vue'
-import type { NodePingBar } from '@/composables/useNodePingDisplay'
 import type { PingMetricLossPoint, PingRecord } from '@/composables/useNodePingStats'
 import type { NodeData } from '@/stores/nodes'
 import type { NodeStatusPing, PingMetricTaskStats } from '@/utils/rpc'
 import { computed, toValue } from 'vue'
-import { buildEmptyPingBars, buildLatencyBars, buildLossBars } from '@/composables/useNodePingDisplay'
+import {
+  getLatencyToneDotClass,
+  getLatencyToneTextClass,
+  getLossToneTextClass,
+} from '@/composables/useNodePingDisplay'
 import { buildPingStatsForTask } from '@/composables/useNodePingStats'
 import { useAppStore } from '@/stores/app'
 
@@ -23,8 +26,10 @@ interface ThreeNetPingItem {
   lossDisplay: string
   latencyTooltip: string
   lossTooltip: string
-  latencyBars: NodePingBar[]
-  lossBars: NodePingBar[]
+  latencyPoints: Array<number | null>
+  latencyToneClass: string
+  lossToneClass: string
+  dotClass: string
 }
 
 interface UseThreeNetPingOptions {
@@ -95,21 +100,13 @@ export function useThreeNetPing(node: MaybeRefOrGetter<NodeData>, options: UseTh
     return appStore.threeNetPingTaskIds.map((id) => {
       const stats = buildPingStatsForTask(records, id, metricStats, metricLossPoints)
       const fullName = taskNameFromStats(metricStats, id) || `任务 ${id}`
-      const emptyTooltip = loading ? '加载中' : `${fullName}\n暂无探测数据`
-      const latencyHistoryBars = buildLatencyBars(stats.history)
-      const lossHistoryBars = buildLossBars(stats.history)
 
       return {
         id,
         statsFullName: fullName,
         stats,
         loading,
-        latencyBars: latencyHistoryBars.length
-          ? latencyHistoryBars
-          : buildEmptyPingBars(emptyTooltip, `task-${id}-latency`),
-        lossBars: lossHistoryBars.length
-          ? lossHistoryBars
-          : buildEmptyPingBars(emptyTooltip, `task-${id}-loss`),
+        latencyPoints: stats.history.map(point => point.latency),
       }
     })
   })
@@ -131,6 +128,11 @@ export function useThreeNetPing(node: MaybeRefOrGetter<NodeData>, options: UseTh
         : stats.hasData
           ? stats.avgLatency
           : null
+      const lossValue = sample && Number.isFinite(sample.loss)
+        ? sample.loss
+        : stats.hasData
+          ? stats.avgLoss
+          : null
 
       return {
         id: item.id,
@@ -141,23 +143,33 @@ export function useThreeNetPing(node: MaybeRefOrGetter<NodeData>, options: UseTh
           : lost
             ? '丢包'
             : `${Math.round(displayLatency ?? 0)} ms`,
-        lossDisplay: sample && Number.isFinite(sample.loss)
-          ? `${sample.loss.toFixed(1)}%`
-          : stats.hasData
-            ? `${stats.avgLoss.toFixed(1)}%`
-            : (item.loading ? '加载中' : '-'),
+        lossDisplay: lossValue === null
+          ? (item.loading ? '加载中' : '-')
+          : `${lossValue.toFixed(1)}%`,
         latencyTooltip: latest === null && !stats.hasData
           ? `${fullName}\n暂无探测数据`
           : lost
             ? `${fullName}\n最近一次探测丢包`
             : `${fullName}\n延迟 ${Math.round(displayLatency ?? 0)} ms`,
-        lossTooltip: sample && Number.isFinite(sample.loss)
-          ? `${fullName}\n丢包 ${sample.loss.toFixed(1)}%`
-          : stats.hasData
-            ? `${fullName}\n平均丢包 ${stats.avgLoss.toFixed(1)}%`
-            : `${fullName}\n暂无探测数据`,
-        latencyBars: item.latencyBars,
-        lossBars: item.lossBars,
+        lossTooltip: lossValue === null
+          ? `${fullName}\n暂无探测数据`
+          : sample && Number.isFinite(sample.loss)
+            ? `${fullName}\n丢包 ${lossValue.toFixed(1)}%`
+            : `${fullName}\n平均丢包 ${lossValue.toFixed(1)}%`,
+        latencyPoints: item.latencyPoints,
+        latencyToneClass: lost
+          ? 'text-signal-5'
+          : displayLatency === null
+            ? 'text-muted-foreground'
+            : getLatencyToneTextClass(displayLatency),
+        lossToneClass: lossValue === null
+          ? 'text-muted-foreground'
+          : getLossToneTextClass(lossValue),
+        dotClass: lost
+          ? 'bg-signal-5'
+          : displayLatency === null
+            ? 'bg-muted-foreground/40'
+            : getLatencyToneDotClass(displayLatency),
       }
     })
   })
