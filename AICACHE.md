@@ -12,6 +12,13 @@
 
 ## 当前任务
 
+- 状态：done，修复三网 Sparkline 行中丢包标签与百分比在窄卡片上的自适应对齐。
+- 实现：`NodeCard.vue` 使用弹性网格，让名称/折线占用剩余空间，延迟和丢包按内容宽度排列；丢包百分比右边缘在各三网行统一，并增加 420px 以下布局兜底。
+- 验证：三网 Playwright 用例 3/3 通过；完整视觉套件 22/22 通过。预览环境不再把 `/admin`/`/terminal` 代理到未运行的 Komari 后端，兼容 Worker 用例通过。`vue-tsc`、构建与改动文件 ESLint 通过；全量 lint 仍有既有 `src/utils/tagHelper.ts:317` 静态正则规则错误。
+- 不做：本次不升主题版本、不创建 Release，除非用户另行要求。
+
+## 上一任务
+
 - 状态：done，已重新打包并覆盖发布 v3.3.14（含移动端背景滚动修复）。
 - 提交：`3adc5e8` `fix: stop mobile background jitter from attachment fixed`
 - Release：https://github.com/towersip/komari-theme-Glassmorphism/releases/tag/v3.3.14 正式发布，非 draft / prerelease；tag 指向 `3adc5e8`。

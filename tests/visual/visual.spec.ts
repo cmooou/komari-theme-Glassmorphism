@@ -246,6 +246,33 @@ test('three-net ping sparkline style uses name latency line and loss', async ({ 
   await expect(card.locator('[data-node-ping-loss="task-1"]')).toContainText(/[1-9]/)
 })
 
+test('three-net sparkline loss values stay aligned on narrow cards', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await installKomariFixture(page, { hideEarth: true, threeNetPing: true, threeNetPingSparkline: true })
+  await openStablePage(page)
+
+  const card = page.getByRole('button', { name: '查看节点 主控-洛杉矶 详情' })
+  const rows = card.locator('.ping-sparkline-row')
+  const lossValues = card.locator('[data-node-ping-loss-value]')
+  await expect(rows).toHaveCount(3)
+  await expect(lossValues).toHaveCount(3)
+
+  const layout = await rows.first().evaluate((element) => {
+    const style = getComputedStyle(element)
+    return {
+      columns: style.gridTemplateColumns,
+      width: element.getBoundingClientRect().width,
+      right: element.getBoundingClientRect().right,
+    }
+  })
+  expect(layout.columns.split(' ').length).toBe(5)
+  expect(layout.width).toBeGreaterThan(0)
+
+  const valueRights = await lossValues.evaluateAll(elements => elements.map(element => element.getBoundingClientRect().right))
+  expect(Math.max(...valueRights) - Math.min(...valueRights)).toBeLessThanOrEqual(1)
+  expect(valueRights.every(right => right <= layout.right + 1)).toBe(true)
+})
+
 test('node card expiry uses red through 5 days and yellow through 10 days', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 })
   await installKomariFixture(page, { expiryThresholds: true, hideEarth: true })

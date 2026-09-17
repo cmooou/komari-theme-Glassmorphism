@@ -528,7 +528,7 @@ function hasRegion(region: string | null | undefined): boolean {
               v-for="row in pingPanelRows"
               :key="row.key"
               type="button"
-              class="group/ping grid min-h-5 min-w-0 grid-cols-[auto_3.5rem_3.25rem_minmax(0,1fr)_4.75rem] items-center gap-x-1.5 rounded-md px-0.5 text-left leading-none hover:bg-slate-500/5"
+              class="ping-sparkline-row group/ping grid min-h-5 min-w-0 grid-cols-[auto_minmax(0,1fr)_max-content_minmax(3.5rem,1fr)_max-content] items-center gap-x-1.5 rounded-md px-0.5 text-left leading-none hover:bg-slate-500/5"
               :title="`${row.latencyTooltip}\n${row.lossTooltip}`"
               :aria-label="row.ariaLabel"
               @click.stop="emit('pingClick')"
@@ -555,15 +555,21 @@ function hasRegion(region: string | null | undefined): boolean {
               </span>
               <span
                 :data-node-ping-loss="row.lossAttr"
-                class="grid min-w-0 grid-cols-[auto_1fr] items-baseline gap-x-1 whitespace-nowrap font-medium tabular-nums"
-                :class="[nodeCardPingTextClass, row.lossToneClass]"
+                class="ping-loss-cell flex min-w-0 items-baseline justify-end gap-x-1 whitespace-nowrap font-medium tabular-nums"
+                :class="nodeCardPingTextClass"
               >
                 <template v-if="row.lossDisplay === '-' || row.lossDisplay === '加载中'">
-                  <span class="col-span-2 text-right">{{ row.lossDisplay }}</span>
+                  <span class="ping-loss-value min-w-[2.75rem] text-right text-muted-foreground">{{ row.lossDisplay }}</span>
                 </template>
                 <template v-else>
-                  <span>丢包</span>
-                  <span class="text-right">{{ row.lossDisplay }}</span>
+                  <span class="ping-loss-label text-muted-foreground/80">丢包</span>
+                  <span
+                    :data-node-ping-loss-value="row.lossAttr"
+                    class="ping-loss-value min-w-[2.75rem] text-right"
+                    :class="row.lossToneClass"
+                  >
+                    {{ row.lossDisplay }}
+                  </span>
                 </template>
               </span>
             </button>
@@ -668,5 +674,29 @@ function hasRegion(region: string | null | undefined): boolean {
 .node-card {
   position: relative;
   overflow: visible;
+}
+
+.ping-sparkline-row {
+  /* Let the name and sparkline share whatever space remains on narrow cards. */
+  min-width: 0;
+}
+
+.ping-loss-cell {
+  justify-self: end;
+}
+
+@media (max-width: 420px) {
+  .ping-sparkline-row {
+    column-gap: 0.375rem;
+    grid-template-columns: auto minmax(0, 1fr) max-content minmax(3rem, 1fr) max-content;
+  }
+
+  .ping-loss-cell {
+    column-gap: 0.25rem;
+  }
+
+  .ping-loss-value {
+    min-width: 2.5rem;
+  }
 }
 </style>

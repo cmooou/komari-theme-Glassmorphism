@@ -1,8 +1,8 @@
 import type { Plugin } from 'vite'
 import { execSync } from 'node:child_process'
+import { existsSync, readFileSync } from 'node:fs'
 import { Agent as HttpAgent } from 'node:http'
 import { Agent as HttpsAgent } from 'node:https'
-import { existsSync, readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { resolve } from 'node:path'
 import process from 'node:process'
@@ -180,6 +180,17 @@ export default defineConfig({
       '/admin': komariDevProxy(true),
       '/terminal': komariDevProxy(true),
       '/assets': komariDevProxy(),
+      '/manifest.webmanifest': komariDevProxy(),
+    },
+  },
+  preview: {
+    // Preview serves the built theme's own assets. Keep API/theme requests
+    // available for local integration, but let SPA routes such as /admin
+    // fall back to the built entry so the compatibility worker can redirect
+    // them without requiring a running Komari backend.
+    proxy: {
+      '/api': komariDevProxy(true),
+      '/themes': komariDevProxy(),
       '/manifest.webmanifest': komariDevProxy(),
     },
   },
