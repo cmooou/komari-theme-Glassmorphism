@@ -253,8 +253,10 @@ test('three-net sparkline loss values stay aligned on narrow cards', async ({ pa
 
   const card = page.getByRole('button', { name: '查看节点 主控-洛杉矶 详情' })
   const rows = card.locator('.ping-sparkline-row')
+  const lossLabels = card.locator('.ping-loss-label')
   const lossValues = card.locator('[data-node-ping-loss-value]')
   await expect(rows).toHaveCount(3)
+  await expect(lossLabels).toHaveCount(3)
   await expect(lossValues).toHaveCount(3)
 
   const layout = await rows.first().evaluate((element) => {
@@ -268,7 +270,9 @@ test('three-net sparkline loss values stay aligned on narrow cards', async ({ pa
   expect(layout.columns.split(' ').length).toBe(5)
   expect(layout.width).toBeGreaterThan(0)
 
+  const labelLefts = await lossLabels.evaluateAll(elements => elements.map(element => element.getBoundingClientRect().left))
   const valueRights = await lossValues.evaluateAll(elements => elements.map(element => element.getBoundingClientRect().right))
+  expect(Math.max(...labelLefts) - Math.min(...labelLefts)).toBeLessThanOrEqual(1)
   expect(Math.max(...valueRights) - Math.min(...valueRights)).toBeLessThanOrEqual(1)
   expect(valueRights.every(right => right <= layout.right + 1)).toBe(true)
 })

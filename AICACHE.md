@@ -12,6 +12,13 @@
 
 ## 当前任务
 
+- 状态：进行中，准备发布 v3.3.15 三网丢包对齐修复包。
+- 内容：三网新版 Sparkline 行收紧间距；固定「丢包」标签列；百分比右对齐；增加窄屏标签对齐回归断言；主题清单和 README 更新到 3.3.15。
+- 发布：本地构建并校验 `komari-theme-Glassmorphism-build-<short-sha>.zip`，提交并推送 `main`，由版本变更工作流创建 `v3.3.15` Release；发布后核验 Release、资产和包内版本。
+- 验证：三网 Playwright 用例 3/3、改动文件 ESLint 已通过；全量 ESLint 仍有仓库既有 Markdown 格式、Sparkline 正则和 `tagHelper.ts:317` 等基线问题，已记录，不扩大本次范围。
+
+## 上一任务
+
 - 状态：done，修复三网 Sparkline 行中丢包标签与百分比在窄卡片上的自适应对齐。
 - 实现：`NodeCard.vue` 使用弹性网格，让名称/折线占用剩余空间，延迟和丢包按内容宽度排列；丢包百分比右边缘在各三网行统一，并增加 420px 以下布局兜底。
 - 验证：三网 Playwright 用例 3/3 通过；完整视觉套件 22/22 通过。预览环境不再把 `/admin`/`/terminal` 代理到未运行的 Komari 后端，兼容 Worker 用例通过。`vue-tsc`、构建与改动文件 ESLint 通过；全量 lint 仍有既有 `src/utils/tagHelper.ts:317` 静态正则规则错误。

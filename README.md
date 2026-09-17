@@ -54,7 +54,7 @@ https://github.com/towersip/komari-theme-Glassmorphism
 | :------- | :-------------------------------------------------------- |
 | 本仓库   | [towersip/komari-theme-Glassmorphism](https://github.com/towersip/komari-theme-Glassmorphism)，自己用，按需改 |
 | 原项目   | [sanrokamlan-prog/komari-theme-Glassmorphism](https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism) |
-| 当前版本 | **v3.3.14**                                               |
+| 当前版本 | **v3.3.15**                                               |
 | 主题定位 | Komari Monitor 可导入 zip 主题，不是普通 Web App 部署包   |
 | 视觉风格 | 毛玻璃卡片、动态背景、浅色 / 深色 / 北京时间自动日夜模式  |
 | 数据能力 | Metric Store 优先，旧接口自动 fallback，兼容 Komari 1.2.x |
@@ -62,6 +62,14 @@ https://github.com/towersip/komari-theme-Glassmorphism
 | 发布产物 | `komari-theme-Glassmorphism-build-<short-sha>.zip`        |
 
 > 按自己盯节点、Ping、流量、费用的习惯改，不是给所有人做的产品。
+
+---
+
+## 📐 v3.3.15 三网丢包对齐优化
+
+- 三网新版样式收紧名称、延迟、折线和丢包之间的间距，避免窄卡片出现过大的空白
+- 「丢包」文字固定到同一列，百分比保持右侧对齐，不会因 `0.0%`、`6.6%`、`31.1%` 宽度不同而错位
+- 增加窄屏布局回归断言，确保三网标签和百分比持续对齐
 
 ---
 
@@ -615,6 +623,15 @@ dist/
 ## 📝 更新日志
 
 <details open>
+<summary><strong>v3.3.15 · 三网丢包对齐优化</strong></summary>
+
+- 收紧三网新版行布局，减少名称、延迟、Sparkline 和丢包之间的无效间距
+- 丢包标签使用固定列，百分比统一右对齐，适配不同位数的丢包数据
+- 增加窄屏回归断言，防止标签再次发生横向错位
+
+</details>
+
+<details>
 <summary><strong>v3.3.14 · 三网新版样式可选</strong></summary>
 
 - 新增「三网新版样式」开关，默认关闭，保留原来的双栏方柱
