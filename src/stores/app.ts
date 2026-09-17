@@ -1213,6 +1213,8 @@ const useAppStore = defineStore('app', () => {
 
   const threeNetPingEnabled = computed<boolean>(() => readBooleanSetting(themeSettings.value, 'threeNetPingEnabled', false))
 
+  const threeNetPingSparkline = computed<boolean>(() => readBooleanSetting(themeSettings.value, 'threeNetPingSparkline', false))
+
   const threeNetPingTaskIds = computed<number[]>(() => parsePingTaskIds(themeSettings.value.threeNetPingTaskIds))
 
   const chartDashboardTemplate = computed<ChartDashboardTemplate>(() => {
@@ -1419,6 +1421,7 @@ const useAppStore = defineStore('app', () => {
     diskPredictionEnabled,
     diskPredictionThresholdDays,
     threeNetPingEnabled,
+    threeNetPingSparkline,
     threeNetPingTaskIds,
     chartDashboardTemplate,
     hideAdminEntryWhenLoggedOut,

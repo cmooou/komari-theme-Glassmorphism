@@ -1,5 +1,7 @@
 import type { Plugin } from 'vite'
 import { execSync } from 'node:child_process'
+import { Agent as HttpAgent } from 'node:http'
+import { Agent as HttpsAgent } from 'node:https'
 import { existsSync, readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { resolve } from 'node:path'
@@ -22,6 +24,43 @@ interface ThemeManifest {
 
 const themeJsonPath = resolve(__dirname, 'komari-theme.json')
 const devApiTarget = process.env.VITE_API_TARGET || 'http://127.0.0.1:25774'
+const devApiIsHttps = devApiTarget.startsWith('https:')
+const devProxyAgent = devApiIsHttps
+  ? new HttpsAgent({ keepAlive: true, maxSockets: 8 })
+  : new HttpAgent({ keepAlive: true, maxSockets: 8 })
+
+function komariDevProxy(ws = false) {
+  return {
+    target: devApiTarget,
+    changeOrigin: true,
+    secure: devApiIsHttps,
+    agent: devProxyAgent,
+    timeout: 60_000,
+    proxyTimeout: 60_000,
+    headers: { Origin: devApiTarget },
+    rewriteWsOrigin: true,
+    ...(ws ? { ws: true } : {}),
+  }
+}
+
+function disableKomariPwaInDev(): Plugin {
+  return {
+    name: 'disable-komari-pwa-in-dev',
+    apply: 'serve',
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const path = req.url?.split('?')[0]
+        if (path !== '/registerSW.js') {
+          next()
+          return
+        }
+
+        res.setHeader('Content-Type', 'application/javascript')
+        res.end('/* theme dev: do not install Komari admin service worker */')
+      })
+    },
+  }
+}
 
 function readThemeManifest(): ThemeManifest {
   if (!existsSync(themeJsonPath))
@@ -124,6 +163,7 @@ export default defineConfig({
     vue(),
     vueDevTools(),
     tailwindcss(),
+    disableKomariPwaInDev(),
     komariThemeZip(),
   ],
   resolve: {
@@ -134,18 +174,13 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     proxy: {
-      '/api': {
-        target: devApiTarget,
-        changeOrigin: true,
-        headers: { Origin: devApiTarget },
-        rewriteWsOrigin: true,
-        ws: true,
-      },
-      '/themes': {
-        target: devApiTarget,
-        changeOrigin: true,
-        headers: { Origin: devApiTarget },
-      },
+      '/api': komariDevProxy(true),
+      '/themes': komariDevProxy(),
+      // Komari 1.5 admin HTML lives on /admin, but its JS/CSS are rooted at /assets.
+      '/admin': komariDevProxy(true),
+      '/terminal': komariDevProxy(true),
+      '/assets': komariDevProxy(),
+      '/manifest.webmanifest': komariDevProxy(),
     },
   },
   build: {

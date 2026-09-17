@@ -266,11 +266,16 @@ const enableNodeCardTransition = computed(() => !appStore.disablePageAnimation &
 const reduceDenseNodeEffects = computed(() => appStore.nodeViewMode === 'card' && nodeList.value.length > denseNodePingAnimationThreshold)
 const deferNodeCards = computed(() => appStore.nodeViewMode === 'card' && nodeList.value.length > UI_CONFIG.virtualList.nodeThreshold)
 const deferredNodeCardHeight = computed(() => {
-  const baseHeight = { mini: 200, compact: 248, comfortable: 288, large: 328 }[appStore.nodeCardSize]
+  const sparkline = appStore.threeNetPingSparkline
+  const baseHeight = sparkline
+    ? { mini: 200, compact: 248, comfortable: 288, large: 328 }[appStore.nodeCardSize]
+    : { mini: 220, compact: 270, comfortable: 310, large: 350 }[appStore.nodeCardSize]
   if (!appStore.threeNetPingEnabled || appStore.threeNetPingTaskIds.length === 0)
     return baseHeight
   const extraRows = Math.max(0, appStore.threeNetPingTaskIds.length - 1)
-  const rowHeight = { mini: 22, compact: 24, comfortable: 26, large: 28 }[appStore.nodeCardSize]
+  const rowHeight = sparkline
+    ? { mini: 22, compact: 24, comfortable: 26, large: 28 }[appStore.nodeCardSize]
+    : { mini: 36, compact: 50, comfortable: 54, large: 62 }[appStore.nodeCardSize]
   return baseHeight + extraRows * rowHeight
 })
 

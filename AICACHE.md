@@ -12,6 +12,28 @@
 
 ## 当前任务
 
+- 状态：in-progress，提交当前改动并发布 v3.3.14 GitHub Release。
+- 版本：`komari-theme.json` `3.3.13` → `3.3.14`。
+- 发布路径：push `main` 后由 `release-on-version-bump.yml` 打 tag `v3.3.14` 并上传 zip。
+- 包含：三网新版样式开关（默认关）、本地 admin 代理、文档、未推送的 sparkline/admin-app 提交。
+
+## 上一任务
+
+- 状态：done，三网延迟新版 Sparkline 改为主题开关，默认关闭并保留旧双栏方柱。
+- 设置：`threeNetPingSparkline`（`komari-theme.json` + `app.ts`，默认 `false`）。开三网仍用 `threeNetPingEnabled` / `threeNetPingTaskIds`。
+- 表现：开关关 = 总览/三网双栏方柱；开关开 = 名称 + ms + Sparkline + 丢包。
+- 验证：`vue-tsc --build`、`git diff --check` 通过。浏览器本机 `localhost:5173`：默认 12 节点总览方柱；Pinia 打开三网后 72 组方柱（电信/移动/联通）；再开新版样式 36 条 Sparkline；列表 Ping 弹窗和节点详情仍可用。
+- 后台：Komari 主题设置表单读的是已导入主题包里的 `komari-theme.json`，本地改完需重新导入才能看到「三网新版样式」开关。
+- 不做：不升版本、不提交、不更新视觉 PNG。
+
+## 上一任务
+
+- 状态：done，开发服代理 Komari 1.5 内置 `/admin`、`/terminal` 和 `/assets`，README 写明 GlassmorphismTS 主题设置入口。
+- 验证：`vite.config.ts` 代理 `/admin`、`/terminal` 到 `VITE_API_TARGET`。
+- 不做：不升版本、不提交。
+
+## 上一任务
+
 - 状态：done，文档改成自己用、按需改，并注明原项目地址。
 - 文档：README、AIAGENTREADME、AGENTS.md、CLAUDE.md、src/AGENTS.md、docs/Architecture.md。
 - 原项目：https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism
@@ -144,6 +166,10 @@
 - 不做：不把 Glassmorphism 默认主题替换混入计费 PR #604；不发布测试构建为正式 Release；不构建 Windows 包。
 
 ## 执行日志
+
+### 2026-09-17 开发服代理内置管理端
+
+- Vite 把 `/admin`、`/terminal`、`/assets` 代理到 `VITE_API_TARGET`；管理端脚本在 `/assets`，不代理时会被 Vite 当成主题 HTML。开发环境不安装 Komari 的 Service Worker。
 
 ### 2026-09-17 文档标明自用 fork
 

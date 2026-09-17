@@ -63,11 +63,13 @@
 必须在仓库根目录运行：
 
 ```bash
-bun run dev       # Vite dev server，代理 /api 到配置目标
+bun run dev       # Vite dev server；代理 /api、/themes、/admin、/terminal、/assets 到 VITE_API_TARGET
 bun run build     # vue-tsc --build + vite build + zip packaging
 bun run preview   # 预览 production build
 bun run lint      # eslint --fix --cache
 ```
+
+本地主题预览是 `http://localhost:5173/`。Komari 1.5 管理端走 `/admin/dashboard`，开发服会代理过去。默认后端 `http://127.0.0.1:25774`，可用 `VITE_API_TARGET` 覆盖。启用短名称 `GlassmorphismTS` 后，后台侧栏「主题设置」才是本主题托管配置。
 
 当前没有测试套件。验证源码变更通常只跑：
 

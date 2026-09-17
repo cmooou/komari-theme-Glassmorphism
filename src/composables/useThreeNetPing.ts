@@ -1,9 +1,13 @@
 import type { MaybeRefOrGetter } from 'vue'
+import type { NodePingBar } from '@/composables/useNodePingDisplay'
 import type { PingMetricLossPoint, PingRecord } from '@/composables/useNodePingStats'
 import type { NodeData } from '@/stores/nodes'
 import type { NodeStatusPing, PingMetricTaskStats } from '@/utils/rpc'
 import { computed, toValue } from 'vue'
 import {
+  buildEmptyPingBars,
+  buildLatencyBars,
+  buildLossBars,
   getLatencyToneDotClass,
   getLatencyToneTextClass,
   getLossToneTextClass,
@@ -26,6 +30,8 @@ interface ThreeNetPingItem {
   lossDisplay: string
   latencyTooltip: string
   lossTooltip: string
+  latencyBars: NodePingBar[]
+  lossBars: NodePingBar[]
   latencyPoints: Array<number | null>
   latencyToneClass: string
   lossToneClass: string
@@ -100,6 +106,9 @@ export function useThreeNetPing(node: MaybeRefOrGetter<NodeData>, options: UseTh
     return appStore.threeNetPingTaskIds.map((id) => {
       const stats = buildPingStatsForTask(records, id, metricStats, metricLossPoints)
       const fullName = taskNameFromStats(metricStats, id) || `任务 ${id}`
+      const emptyTooltip = loading ? '加载中' : `${fullName}\n暂无探测数据`
+      const latencyHistoryBars = buildLatencyBars(stats.history)
+      const lossHistoryBars = buildLossBars(stats.history)
 
       return {
         id,
@@ -107,6 +116,12 @@ export function useThreeNetPing(node: MaybeRefOrGetter<NodeData>, options: UseTh
         stats,
         loading,
         latencyPoints: stats.history.map(point => point.latency),
+        latencyBars: latencyHistoryBars.length
+          ? latencyHistoryBars
+          : buildEmptyPingBars(emptyTooltip, `task-${id}-latency`),
+        lossBars: lossHistoryBars.length
+          ? lossHistoryBars
+          : buildEmptyPingBars(emptyTooltip, `task-${id}-loss`),
       }
     })
   })
@@ -156,6 +171,8 @@ export function useThreeNetPing(node: MaybeRefOrGetter<NodeData>, options: UseTh
           : sample && Number.isFinite(sample.loss)
             ? `${fullName}\n丢包 ${lossValue.toFixed(1)}%`
             : `${fullName}\n平均丢包 ${lossValue.toFixed(1)}%`,
+        latencyBars: item.latencyBars,
+        lossBars: item.lossBars,
         latencyPoints: item.latencyPoints,
         latencyToneClass: lost
           ? 'text-signal-5'

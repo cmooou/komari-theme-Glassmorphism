@@ -54,7 +54,7 @@ https://github.com/towersip/komari-theme-Glassmorphism
 | :------- | :-------------------------------------------------------- |
 | 本仓库   | [towersip/komari-theme-Glassmorphism](https://github.com/towersip/komari-theme-Glassmorphism)，自己用，按需改 |
 | 原项目   | [sanrokamlan-prog/komari-theme-Glassmorphism](https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism) |
-| 当前版本 | **v3.3.13**                                               |
+| 当前版本 | **v3.3.14**                                               |
 | 主题定位 | Komari Monitor 可导入 zip 主题，不是普通 Web App 部署包   |
 | 视觉风格 | 毛玻璃卡片、动态背景、浅色 / 深色 / 北京时间自动日夜模式  |
 | 数据能力 | Metric Store 优先，旧接口自动 fallback，兼容 Komari 1.2.x |
@@ -62,6 +62,15 @@ https://github.com/towersip/komari-theme-Glassmorphism
 | 发布产物 | `komari-theme-Glassmorphism-build-<short-sha>.zip`        |
 
 > 按自己盯节点、Ping、流量、费用的习惯改，不是给所有人做的产品。
+
+---
+
+## 📶 v3.3.14 三网新版样式可选
+
+- 主题设置新增「三网新版样式」，默认关闭，节点卡片延迟/丢包继续用原来的双栏方柱
+- 打开后改为名称 + 当前延迟 + Sparkline 折线 + 丢包率；未开三网时只影响卡片上的一组总览
+- 本地 `bun run dev` 把 `/admin`、`/terminal`、`/assets` 代理到 Komari 1.5 内置管理端，方便改主题设置
+- 主题包不再携带旧 `admin-app`
 
 ---
 
@@ -512,7 +521,7 @@ API / RPC
 | 首页布局       | 公告、地球样式、访客信息、毛玻璃 / 色觉辅助配色     |
 | 总览卡片       | 10 套方案、自定义 keys 和显示顺序                   |
 | 高级工具与隐私 | 工具总开关、隐藏后台 / 价格、厂商别名、导出二级密码 |
-| 快捷控制与列表 | 快捷按钮、列表元数据、离线置底、预警阈值、三网延迟  |
+| 快捷控制与列表 | 快捷按钮、列表元数据、离线置底、预警阈值、三网延迟、三网新版样式 |
 | 详情概览       | 18 类指标卡、7 套方案、分区标签页                   |
 | 详情图表       | 12 个图表族、9 套方案、GPU 图表和自定义 keys        |
 | 自定义背景     | 亮 / 暗 URL、图片 / 视频、模糊和遮罩                |
@@ -554,6 +563,29 @@ bun run test:visual
 bun run preview
 ```
 
+`bun run dev` 只跑主题首页。Komari 1.5 的管理端在监控服务自己那一侧，主题不再内嵌后台。
+
+开发时把 API 指到你正在用的 Komari（默认 `http://127.0.0.1:25774`）：
+
+```bash
+# 本机 Komari
+bun run dev
+
+# 远程实例
+VITE_API_TARGET=https://你的Komari域名 bun run dev
+```
+
+然后：
+
+1. 打开主题预览：http://localhost:5173/
+2. 点右上角齿轮「后台管理」，会进 `/admin/dashboard`（开发服已代理到 Komari 内置管理端）
+3. 第一次：左侧 **设置 → 主题管理**，上传本仓库 `bun run build` 生成的 zip，启用短名称 **GlassmorphismTS**
+4. 启用后侧栏会出现托管配置 **主题设置**，改完保存，回到 http://localhost:5173/ 刷新即可看到
+
+也可以直接打开 Komari 自己的后台：`http://127.0.0.1:25774/admin/dashboard` 或 `https://你的域名/admin/dashboard`。裸 `/admin` 在部分 1.5 版本会 404，用 `/admin/dashboard`。
+
+改 `src/` 会热更新；改后台主题设置要保存后再刷新首页。没启用 GlassmorphismTS 时，不会出现这套「主题设置」。
+
 更新确认过的视觉基准图：
 
 ```bash
@@ -582,6 +614,16 @@ dist/
 ## 📝 更新日志
 
 <details open>
+<summary><strong>v3.3.14 · 三网新版样式可选</strong></summary>
+
+- 新增「三网新版样式」开关，默认关闭，保留原来的双栏方柱
+- 开启后显示名称、当前延迟、历史 Sparkline 和丢包率
+- 开发服代理 Komari 1.5 内置 `/admin`、`/terminal` 和 `/assets`
+- 安装包不再包含旧 `admin-app`
+
+</details>
+
+<details>
 <summary><strong>v3.3.13 · 主题商店独立短名称</strong></summary>
 
 - 市场唯一短名称改为 `GlassmorphismTS`，避免与已上架的 `Glassmorphism` 冲突

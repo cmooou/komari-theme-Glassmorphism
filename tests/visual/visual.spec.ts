@@ -26,12 +26,13 @@ async function expectNodeMetricIcons(page: Page): Promise<void> {
     await expect(page.locator(`[data-node-metric-icon="${metric}"]`).first()).toBeVisible()
 }
 
-async function expectNodePingSparkline(page: Page): Promise<void> {
+async function expectNodePingBars(page: Page): Promise<void> {
   const card = page.getByRole('button', { name: '查看节点 主控-洛杉矶 详情' })
-  const sparkline = card.locator('[data-node-ping-sparkline="latency"]')
-  await expect(sparkline).toBeVisible()
-  await expect.poll(() => sparkline.evaluate(element => element.getBoundingClientRect().width)).toBeGreaterThan(0)
-  await expect(card.locator('[data-node-ping-loss="loss"]')).toBeVisible()
+  for (const metric of ['latency', 'loss']) {
+    const bars = card.locator(`[data-node-ping-bars="${metric}"]`)
+    await expect(bars).toBeVisible()
+    await expect.poll(() => bars.evaluate(element => element.getBoundingClientRect().width)).toBeGreaterThan(0)
+  }
 }
 
 test('home light desktop', async ({ page }) => {
@@ -39,7 +40,7 @@ test('home light desktop', async ({ page }) => {
   await installKomariFixture(page)
   await openStablePage(page)
   await expectNodeMetricIcons(page)
-  await expectNodePingSparkline(page)
+  await expectNodePingBars(page)
   await expect(page).toHaveScreenshot('home-light-desktop.png', { fullPage: false })
 })
 
@@ -198,7 +199,39 @@ test('three-net ping replaces summary bars with selected tasks', async ({ page }
 
   const card = page.getByRole('button', { name: '查看节点 主控-洛杉矶 详情' })
   await expect(card.locator('[data-three-net-ping]')).toBeVisible()
+  await expect(card.locator('[data-node-ping-bars="latency"]')).toHaveCount(0)
+  await expect(card.locator('[data-node-ping-sparkline]')).toHaveCount(0)
+  await expect(card.getByText('广东电信', { exact: true })).toBeVisible()
+  await expect(card.getByText('广东移动', { exact: true })).toBeVisible()
+  await expect(card.getByText('广东联通', { exact: true })).toBeVisible()
+
+  for (const taskId of [1, 3, 4]) {
+    for (const metric of ['latency', 'loss']) {
+      const bars = card.locator(`[data-node-ping-bars="task-${taskId}-${metric}"]`)
+      await expect(bars).toBeVisible()
+      await expect.poll(() => bars.evaluate(element => element.getBoundingClientRect().width)).toBeGreaterThan(0)
+    }
+  }
+
+  const lossTooltips = card.locator('[data-node-ping-bars="task-1-loss"] [role="tooltip"]')
+  await expect.poll(async () => {
+    const texts = await lossTooltips.allTextContents()
+    return texts.some((text) => {
+      const match = text.match(/(\d+(?:\.\d+)?)%/)
+      return Boolean(match && Number(match[1]) > 0)
+    })
+  }).toBeTruthy()
+})
+
+test('three-net ping sparkline style uses name latency line and loss', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 })
+  await installKomariFixture(page, { hideEarth: true, threeNetPing: true, threeNetPingSparkline: true })
+  await openStablePage(page)
+
+  const card = page.getByRole('button', { name: '查看节点 主控-洛杉矶 详情' })
+  await expect(card.locator('[data-three-net-ping]')).toBeVisible()
   await expect(card.locator('[data-node-ping-sparkline="latency"]')).toHaveCount(0)
+  await expect(card.locator('[data-node-ping-bars]')).toHaveCount(0)
   await expect(card.getByText('广东电信', { exact: true })).toBeVisible()
   await expect(card.getByText('广东移动', { exact: true })).toBeVisible()
   await expect(card.getByText('广东联通', { exact: true })).toBeVisible()

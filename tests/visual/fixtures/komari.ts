@@ -27,6 +27,7 @@ export interface VisualFixtureOptions {
   missingCpuMetricHistory?: boolean
   pingTaskOrdering?: boolean
   threeNetPing?: boolean
+  threeNetPingSparkline?: boolean
   generalCardKeys?: string[]
 }
 
@@ -380,6 +381,7 @@ export async function installKomariFixture(page: Page, options: VisualFixtureOpt
           threeNetPingTaskIds: [1, 3, 4],
         }
       : {}),
+    ...(options.threeNetPingSparkline ? { threeNetPingSparkline: true } : {}),
   }
 
   await page.addInitScript(({ fixedNow }) => {

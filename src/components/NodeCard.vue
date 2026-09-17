@@ -66,7 +66,10 @@ const nodeCardMetricGridClass = 'grid-cols-3'
 const nodeCardMetricBoxClass = computed(() => isMiniNodeCard.value
   ? 'px-1 py-1'
   : appStore.nodeCardSize === 'compact' ? 'px-1.5 py-1.5' : 'px-2 py-1.5')
+const nodeCardPanelClass = computed(() => appStore.nodeCardSize === 'large' ? 'h-14' : appStore.nodeCardSize === 'comfortable' ? 'h-12' : isMiniNodeCard.value ? 'h-7' : 'h-11')
+const nodeCardPingPanelClass = computed(() => isMiniNodeCard.value ? 'gap-1 p-1' : 'gap-1.5 p-2')
 const nodeCardPingTextClass = computed(() => isMiniNodeCard.value ? 'text-[10px]' : 'text-[11px]')
+const pingSparklineStyle = computed(() => appStore.threeNetPingSparkline)
 
 const formatBytes = (bytes: number) => formatBytesWithConfig(bytes, appStore.byteDecimals)
 const formatBytesPerSecond = (bytes: number) => formatBytesPerSecondWithConfig(bytes, appStore.byteDecimals)
@@ -84,6 +87,8 @@ const diskPercentage = computed(() => getDiskPercentage(props.node))
 const diskStatus = computed(() => getStatus(diskPercentage.value))
 
 const {
+  latencyRenderBars,
+  lossRenderBars,
   latencyPoints,
   latencyDisplay,
   lossDisplay,
@@ -111,10 +116,18 @@ const pingPanelRows = computed(() => {
       sparklineAttr: `task-${item.id}`,
       lossAttr: `task-${item.id}`,
       label: item.label,
+      latencyLabel: item.label,
       latencyDisplay: item.latencyDisplay,
       latencyTooltip: item.latencyTooltip,
+      latencyAria: `${props.node.name} ${item.fullName} 延迟`,
+      latencyBars: item.latencyBars,
+      latencyBarsAttr: `task-${item.id}-latency`,
+      lossLabel: '丢包',
       lossDisplay: item.lossDisplay,
       lossTooltip: item.lossTooltip,
+      lossAria: `${props.node.name} ${item.fullName} 丢包`,
+      lossBars: item.lossBars,
+      lossBarsAttr: `task-${item.id}-loss`,
       ariaLabel: `${props.node.name} ${item.fullName} 延迟和丢包`,
       latencyPoints: item.latencyPoints,
       latencyToneClass: item.latencyToneClass,
@@ -128,10 +141,18 @@ const pingPanelRows = computed(() => {
     sparklineAttr: 'latency',
     lossAttr: 'loss',
     label: '延迟',
+    latencyLabel: '延迟',
     latencyDisplay: latencyDisplay.value,
     latencyTooltip: latencyPanelTooltip.value,
+    latencyAria: `${props.node.name} 延迟监测`,
+    latencyBars: latencyRenderBars.value,
+    latencyBarsAttr: 'latency',
+    lossLabel: '丢包',
     lossDisplay: lossDisplay.value,
     lossTooltip: lossPanelTooltip.value,
+    lossAria: `${props.node.name} 丢包监测`,
+    lossBars: lossRenderBars.value,
+    lossBarsAttr: 'loss',
     ariaLabel: `${props.node.name} 延迟和丢包监测`,
     latencyPoints: latencyPoints.value,
     latencyToneClass: latencyToneClass.value,
@@ -496,55 +517,122 @@ function hasRegion(region: string | null | undefined): boolean {
           </div>
         </div>
 
-        <!-- 延迟 + 丢包：默认一行总览；开启三网后每条线路一行 Sparkline -->
+        <!-- 延迟 + 丢包：默认总览一行；开启三网后每条线路一行。新版 Sparkline 由 threeNetPingSparkline 控制。 -->
         <div
           :data-three-net-ping="threeNetPingVisible ? '' : undefined"
-          class="flex flex-col gap-1"
-          :class="!props.node.online && 'opacity-50'"
+          class="flex flex-col"
+          :class="[pingSparklineStyle ? 'gap-1' : 'gap-1.5', pingSparklineStyle && !props.node.online && 'opacity-50']"
         >
-          <button
-            v-for="row in pingPanelRows"
-            :key="row.key"
-            type="button"
-            class="group/ping grid min-h-5 min-w-0 grid-cols-[auto_3.5rem_3.25rem_minmax(0,1fr)_4.75rem] items-center gap-x-1.5 rounded-md px-0.5 text-left leading-none hover:bg-slate-500/5"
-            :title="`${row.latencyTooltip}\n${row.lossTooltip}`"
-            :aria-label="row.ariaLabel"
-            @click.stop="emit('pingClick')"
-          >
-            <span class="size-1.5 shrink-0 rounded-full" :class="row.dotClass" />
-            <span
-              class="min-w-0 truncate text-muted-foreground"
-              :class="nodeCardPingTextClass"
+          <template v-if="pingSparklineStyle">
+            <button
+              v-for="row in pingPanelRows"
+              :key="row.key"
+              type="button"
+              class="group/ping grid min-h-5 min-w-0 grid-cols-[auto_3.5rem_3.25rem_minmax(0,1fr)_4.75rem] items-center gap-x-1.5 rounded-md px-0.5 text-left leading-none hover:bg-slate-500/5"
+              :title="`${row.latencyTooltip}\n${row.lossTooltip}`"
+              :aria-label="row.ariaLabel"
+              @click.stop="emit('pingClick')"
             >
-              {{ row.label }}
-            </span>
-            <span
-              class="text-right font-medium tabular-nums"
-              :class="[nodeCardPingTextClass, row.latencyToneClass]"
+              <span class="size-1.5 shrink-0 rounded-full" :class="row.dotClass" />
+              <span
+                class="min-w-0 truncate text-muted-foreground"
+                :class="nodeCardPingTextClass"
+              >
+                {{ row.label }}
+              </span>
+              <span
+                class="text-right font-medium tabular-nums"
+                :class="[nodeCardPingTextClass, row.latencyToneClass]"
+              >
+                {{ row.latencyDisplay }}
+              </span>
+              <span
+                :data-node-ping-sparkline="row.sparklineAttr"
+                class="h-4 min-w-0"
+                :class="row.latencyToneClass"
+              >
+                <Sparkline :values="row.latencyPoints" />
+              </span>
+              <span
+                :data-node-ping-loss="row.lossAttr"
+                class="grid min-w-0 grid-cols-[auto_1fr] items-baseline gap-x-1 whitespace-nowrap font-medium tabular-nums"
+                :class="[nodeCardPingTextClass, row.lossToneClass]"
+              >
+                <template v-if="row.lossDisplay === '-' || row.lossDisplay === '加载中'">
+                  <span class="col-span-2 text-right">{{ row.lossDisplay }}</span>
+                </template>
+                <template v-else>
+                  <span>丢包</span>
+                  <span class="text-right">{{ row.lossDisplay }}</span>
+                </template>
+              </span>
+            </button>
+          </template>
+          <template v-else>
+            <div
+              v-for="row in pingPanelRows"
+              :key="row.key"
+              class="grid grid-cols-2 gap-1.5"
             >
-              {{ row.latencyDisplay }}
-            </span>
-            <span
-              :data-node-ping-sparkline="row.sparklineAttr"
-              class="h-4 min-w-0"
-              :class="row.latencyToneClass"
-            >
-              <Sparkline :values="row.latencyPoints" />
-            </span>
-            <span
-              :data-node-ping-loss="row.lossAttr"
-              class="grid min-w-0 grid-cols-[auto_1fr] items-baseline gap-x-1 whitespace-nowrap font-medium tabular-nums"
-              :class="[nodeCardPingTextClass, row.lossToneClass]"
-            >
-              <template v-if="row.lossDisplay === '-' || row.lossDisplay === '加载中'">
-                <span class="col-span-2 text-right">{{ row.lossDisplay }}</span>
-              </template>
-              <template v-else>
-                <span>丢包</span>
-                <span class="text-right">{{ row.lossDisplay }}</span>
-              </template>
-            </span>
-          </button>
+              <button
+                type="button"
+                class="group/panel relative flex min-w-0 flex-col rounded-lg bg-slate-500/5"
+                :class="[nodeCardPingPanelClass, nodeCardPanelClass, !props.node.online ? 'blur-xs opacity-50' : '']"
+                :title="row.latencyTooltip"
+                :aria-label="row.latencyAria"
+                @click.stop="emit('pingClick')"
+              >
+                <div class="flex min-w-0 items-center justify-between gap-1 text-[11px] leading-none">
+                  <span class="truncate text-muted-foreground">{{ row.latencyLabel }}</span>
+                  <span class="shrink-0 font-medium tabular-nums">{{ row.latencyDisplay }}</span>
+                </div>
+                <div
+                  :data-node-ping-bars="row.latencyBarsAttr"
+                  class="grid min-h-0 min-w-0 w-full flex-1 items-end gap-[1px] opacity-80 group-hover/panel:opacity-100"
+                  :style="{ gridTemplateColumns: `repeat(${row.latencyBars.length}, minmax(0, 1fr))` }"
+                >
+                  <DataTooltip
+                    v-for="bar in row.latencyBars" :key="bar.key"
+                    placement="top" :content="bar.tooltip" class="h-full w-full"
+                  >
+                    <span
+                      class="block h-full w-full rounded-[1px] transition-transform duration-150 group-hover/data-tooltip:scale-y-160 group-hover/panel:opacity-60 group-hover/data-tooltip:!opacity-100"
+                      :class="bar.className"
+                    />
+                  </DataTooltip>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                class="group/panel relative flex min-w-0 flex-col rounded-lg bg-slate-500/5"
+                :class="[nodeCardPingPanelClass, nodeCardPanelClass, !props.node.online ? 'blur-xs opacity-50' : '']"
+                :title="row.lossTooltip"
+                :aria-label="row.lossAria"
+                @click.stop="emit('pingClick')"
+              >
+                <div class="flex min-w-0 items-center justify-between gap-1 text-[11px] leading-none">
+                  <span class="truncate text-muted-foreground">{{ row.lossLabel }}</span>
+                  <span class="shrink-0 font-medium tabular-nums">{{ row.lossDisplay }}</span>
+                </div>
+                <div
+                  :data-node-ping-bars="row.lossBarsAttr"
+                  class="grid min-h-0 min-w-0 w-full flex-1 items-end gap-[1px] opacity-80 group-hover/panel:opacity-100"
+                  :style="{ gridTemplateColumns: `repeat(${row.lossBars.length}, minmax(0, 1fr))` }"
+                >
+                  <DataTooltip
+                    v-for="bar in row.lossBars" :key="bar.key"
+                    placement="top" :content="bar.tooltip" class="h-full w-full"
+                  >
+                    <span
+                      class="block h-full w-full rounded-[1px] transition-transform duration-150 group-hover/data-tooltip:scale-y-160 group-hover/panel:opacity-60 group-hover/data-tooltip:!opacity-100"
+                      :class="bar.className"
+                    />
+                  </DataTooltip>
+                </div>
+              </button>
+            </div>
+          </template>
         </div>
 
         <!-- 自定义标签 -->
