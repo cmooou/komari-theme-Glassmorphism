@@ -328,11 +328,25 @@ function hasRegion(region: string | null | undefined): boolean {
     </template>
 
     <template #default>
-      <div class="relative flex flex-col overflow-hidden" :class="nodeCardContentClass">
+      <div
+        data-node-card-content
+        class="node-card-content relative flex flex-col"
+        :class="[nodeCardContentClass, !props.node.online && 'node-card-content--offline']"
+      >
         <!-- 在线天数固定展示，价格独立展示，避免不同主机卡片高度不一致 -->
-        <div class="relative z-20 flex items-center gap-1.5 -mt-1 h-[19px] overflow-hidden">
-          <span class="shrink-0 text-[11px] px-2 py-0.5 rounded-full bg-slate-500/10 text-muted-foreground leading-tight">
+        <div class="node-card-status-row relative z-20 flex items-center gap-1.5 -mt-1 h-[19px] overflow-hidden">
+          <span
+            v-if="props.node.online"
+            class="shrink-0 text-[11px] px-2 py-0.5 rounded-full bg-slate-500/10 text-muted-foreground leading-tight"
+          >
             {{ uptimeDaysText }}
+          </span>
+          <span
+            v-else
+            class="inline-flex shrink-0 items-center gap-1 rounded-full border border-destructive/20 bg-destructive/10 px-2 py-0.5 text-[11px] leading-tight text-destructive"
+          >
+            <Icon icon="tabler:cloud-off" width="11" height="11" />
+            离线
           </span>
           <span
             v-if="priceText"
@@ -653,15 +667,15 @@ function hasRegion(region: string | null | undefined): boolean {
           </Badge>
         </div>
 
-        <!-- 离线遮罩 -->
         <div
           v-if="!props.node.online"
-          class="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center rounded-xl bg-white/20 dark:bg-black/20 backdrop-blur-[2px]"
+          data-offline-status
+          class="node-card-offline-status pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center"
         >
           <div class="text-sm font-semibold text-destructive">
             离线
           </div>
-          <div class="text-[11px] text-muted-foreground mt-1">
+          <div class="mt-1 text-[11px] text-muted-foreground">
             {{ offlineTime }}
           </div>
         </div>
@@ -674,6 +688,11 @@ function hasRegion(region: string | null | undefined): boolean {
 .node-card {
   position: relative;
   overflow: visible;
+}
+
+.node-card-content--offline > :not(.node-card-status-row):not(.node-card-offline-status) {
+  opacity: 0.42;
+  filter: saturate(0.55);
 }
 
 .ping-sparkline-row {

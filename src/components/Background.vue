@@ -9,7 +9,6 @@ const hasError = ref(false)
 
 const showBackground = computed(() => appStore.backgroundEnabled)
 const currentUrl = computed(() => showBackground.value ? appStore.currentBackgroundUrl : '')
-const backgroundOrientation = computed(() => appStore.resolvedBackgroundOrientation)
 const backgroundType = computed(() => appStore.backgroundType)
 const hasCustomBackground = computed(() => showBackground.value && !!currentUrl.value)
 const showBackgroundOverlay = computed(() => appStore.backgroundOverlay > 0)
@@ -110,7 +109,7 @@ function handleVideoError() {
   hasError.value = true
 }
 
-watch([showBackground, currentUrl, backgroundOrientation, backgroundType], ([enabled, url, _orientation, type]) => {
+watch([showBackground, currentUrl, backgroundType], ([enabled, url, type]) => {
   if (!enabled || !url) {
     resetBackgroundState()
     return

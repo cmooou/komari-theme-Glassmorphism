@@ -3,7 +3,7 @@ import type { MeInfo, PublicSettings } from '@/utils/api'
 import type { ByteDecimalsConfig } from '@/utils/helper'
 import { useStorageAsync } from '@vueuse/core'
 import { defineStore } from 'pinia'
-import { computed, onScopeDispose, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { getAuthSession, requirePermission, setAuthSessionFromLogin, verifyLogin } from '@/services/auth.service'
 
 export type ThemeMode = 'auto' | 'light' | 'dark'
@@ -1284,22 +1284,7 @@ const useAppStore = defineStore('app', () => {
     return 'image'
   })
 
-  const viewportOrientation = ref<BackgroundOrientation>(getViewportOrientation())
-
-  function updateViewportOrientation() {
-    const nextOrientation = getViewportOrientation()
-    if (nextOrientation !== viewportOrientation.value)
-      viewportOrientation.value = nextOrientation
-  }
-
-  if (typeof window !== 'undefined') {
-    window.addEventListener('resize', updateViewportOrientation)
-    window.addEventListener('orientationchange', updateViewportOrientation)
-    onScopeDispose(() => {
-      window.removeEventListener('resize', updateViewportOrientation)
-      window.removeEventListener('orientationchange', updateViewportOrientation)
-    })
-  }
+  const initialViewportOrientation = getViewportOrientation()
 
   const backgroundOrientationMode = computed<BackgroundOrientationMode>(() => {
     const mode = themeSettings.value.backgroundOrientationMode
@@ -1308,7 +1293,7 @@ const useAppStore = defineStore('app', () => {
 
   const resolvedBackgroundOrientation = computed<BackgroundOrientation>(() => {
     const mode = backgroundOrientationMode.value
-    return mode === 'auto' ? viewportOrientation.value : mode
+    return mode === 'auto' ? initialViewportOrientation : mode
   })
 
   const pickConfiguredBackground = (mode: 'light' | 'dark', orientation?: BackgroundOrientation): string => {

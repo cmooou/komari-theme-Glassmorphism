@@ -12,6 +12,14 @@
 
 ## 当前任务
 
+- 状态：done，已移除横竖屏切换时自动重新加载背景。
+- 实现：保留亮暗模式的横屏 / 竖屏独立背景配置；移除背景的 `resize` / `orientationchange` 监听，`auto` 仅在 store 初始化时判断一次方向。同一页面内旋转不切换、不重载背景，刷新后才按新视口选择。
+- 文档 / 回归：同步更新 `komari-theme.json`、README 说明；Playwright 用例改为验证旋转保持初始背景、刷新后切换到新方向背景。
+- 验证：`bun run build` 通过；Node 22 下改动的 TS / Vue / Playwright 文件 ESLint 通过；系统 Chrome 聚焦回归 1/1 通过；`git diff --check` 通过。默认 Node 20 的全量 lint 因 `Object.groupBy is not a function` 未进入规则检查，已用 Node 22 聚焦 lint 覆盖本次运行时与用例文件。
+- 不做：不升版本、不发布；不动用户已有的 `NodeCard.vue` 暂存及 `vite.config.ts` 未暂存修改。
+
+## 上一任务
+
 - 状态：done，v3.3.16 已通过 GitHub API 发布。
 - 内容：新增 `backgroundOrientationMode`（auto / landscape / portrait）以及亮暗模式的横屏、竖屏背景地址。auto 根据 `window.innerWidth` / `window.innerHeight` 及 resize/orientationchange 选择方向；方向地址留空时回退到原亮暗背景地址，兼容现有随机壁纸 API 与 `local:` 资源。多图地址支持换行、英文逗号、中文顿号、竖线和分号。
 - 当前修改：`src/stores/app.ts`、`src/components/Background.vue`、`komari-theme.json`、`README.md` 和视觉夹具已更新；版本号已提升到 `3.3.16`。

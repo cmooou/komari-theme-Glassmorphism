@@ -72,7 +72,7 @@
       { "name": "08 · 自定义背景", "type": "title" },
       { "key": "backgroundEnabled", "name": "启用自定义背景", "type": "switch", "default": false, "help": "启用后可设置自定义图片或视频作为页面背景" },
       { "key": "backgroundType", "name": "背景类型", "type": "select", "default": "image", "options": "image,video", "help": "image=图片； video=视频。" },
-      { "key": "backgroundOrientationMode", "name": "背景方向模式", "type": "select", "default": "auto", "options": "auto,landscape,portrait", "help": "auto=按当前设备视口自动选择横屏或竖屏；landscape=强制横屏；portrait=强制竖屏。" },
+      { "key": "backgroundOrientationMode", "name": "背景方向模式", "type": "select", "default": "auto", "options": "auto,landscape,portrait", "help": "auto=进入或刷新页面时按当前视口选择横屏或竖屏，页面内切换方向不重新加载背景；landscape=强制横屏；portrait=强制竖屏。" },
       { "key": "lightBackgroundUrl", "name": "亮色模式背景地址", "type": "string", "default": "", "help": "支持 http(s) URL、站内 / 路径；持久本地文件放在 data/theme/user-assets/ 后填写 local:文件名。可填多张，用换行、英文逗号、中文顿号、竖线或分号分隔；每次进入或刷新页面随机选一张，节点数据刷新不会换图。" },
       { "key": "darkBackgroundUrl", "name": "暗色模式背景地址", "type": "string", "default": "", "help": "支持 http(s) URL、站内 / 路径；持久本地文件放在 data/theme/user-assets/ 后填写 local:文件名。可填多张，用换行、英文逗号、中文顿号、竖线或分号分隔；每次进入或刷新页面随机选一张，节点数据刷新不会换图。" },
       { "key": "lightBackgroundLandscapeUrl", "name": "亮色横屏背景地址", "type": "string", "default": "", "help": "横屏时优先使用；留空则回退到亮色模式背景地址。支持 http(s) URL、站内 / 路径、local:文件名及多张地址，可用换行、英文逗号、中文顿号、竖线或分号分隔。" },

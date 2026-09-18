@@ -52,7 +52,7 @@ test('home dark mobile', async ({ page }) => {
   await expect(page).toHaveScreenshot('home-dark-mobile.png', { fullPage: false })
 })
 
-test('custom background follows viewport orientation', async ({ page }) => {
+test('custom background keeps its initial viewport orientation until reload', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await installKomariFixture(page, {
     hideEarth: true,
@@ -74,6 +74,11 @@ test('custom background follows viewport orientation', async ({ page }) => {
   await expect.poll(backgroundImage).toMatch(/portrait-[ab]\.svg/)
 
   await page.setViewportSize({ width: 1280, height: 720 })
+  await expect.poll(() => page.evaluate(() => [window.innerWidth, window.innerHeight])).toEqual([1280, 720])
+  await expect.poll(backgroundImage).toMatch(/portrait-[ab]\.svg/)
+
+  await page.reload()
+  await expect(background).toBeVisible()
   await expect.poll(backgroundImage).toContain('landscape.svg')
 })
 
