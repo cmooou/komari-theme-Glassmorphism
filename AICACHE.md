@@ -12,6 +12,16 @@
 
 ## 当前任务
 
+- 状态：done，v3.3.17 已通过 GitHub API 发布。
+- 内容：离线节点卡片改为顶栏「离线」徽章 + 内容降饱和，去掉整卡毛玻璃遮罩；`auto` 背景方向只在进入或刷新时判断一次，页面内旋转不再重新加载背景。
+- 提交：`b11a46c` 运行时修复、`a4b07f9` 版本 bump、`38e9db2` README 发布说明，均已推送 `main`。
+- Release：https://github.com/towersip/komari-theme-Glassmorphism/releases/tag/v3.3.17 正式发布，非 draft / prerelease；tag 指向 `38e9db22178f120efeb434f2a3488d2f04b7adea`。
+- 资产：`komari-theme-Glassmorphism-build-38e9db2.zip`，5,149,298 bytes，SHA-256 `D96435651B4F28812A088123786314315110E26E2BC5B2AF5B9ABE20B9767FD2`；GitHub API digest 与下载后本地一致，包内版本 `3.3.17`，353 个条目，顶层 `komari-theme.json` / `preview.png` / `dist/`。
+- 验证：`vue-tsc --build` 与 `vite build` 通过；zip 无 `admin-app`；本仓库 Actions 仍无 workflow run，因此未走 `Release On Version Bump`。
+- 不做：不 force-push；不给 `package.json` 加顶层 version。
+
+## 上一任务
+
 - 状态：done，已移除横竖屏切换时自动重新加载背景。
 - 实现：保留亮暗模式的横屏 / 竖屏独立背景配置；移除背景的 `resize` / `orientationchange` 监听，`auto` 仅在 store 初始化时判断一次方向。同一页面内旋转不切换、不重载背景，刷新后才按新视口选择。
 - 文档 / 回归：同步更新 `komari-theme.json`、README 说明；Playwright 用例改为验证旋转保持初始背景、刷新后切换到新方向背景。
@@ -210,6 +220,12 @@
 - 不做：不把 Glassmorphism 默认主题替换混入计费 PR #604；不发布测试构建为正式 Release；不构建 Windows 包。
 
 ## 执行日志
+
+### 2026-09-18 v3.3.17 Release
+
+- README 当前版本与更新日志同步到 `v3.3.17`；提交 `38e9db2` 已推送 `main`。
+- 本地构建生成 `komari-theme-Glassmorphism-build-38e9db2.zip`；tag `v3.3.17` 指向该提交。
+- 因仓库 Actions 无 workflow run，使用 GitHub API 创建正式 Release 并上传 zip；下载复核 SHA-256、包内版本和顶层契约均通过。
 
 ### 2026-09-17 开发服代理内置管理端
 
@@ -541,6 +557,7 @@
 
 ## 验证记录
 
+- 2026-09-18 v3.3.17 release：`vue-tsc --build`、`vite build`、`git diff --check` 通过；本地 zip 顶层为 `komari-theme.json`、`preview.png`、`dist/`，包内版本 `3.3.17`，353 个条目。GitHub Release `v3.3.17` 为正式发布（非 draft / prerelease），tag / target 均为 `38e9db22178f120efeb434f2a3488d2f04b7adea`。线上 zip `komari-theme-Glassmorphism-build-38e9db2.zip` 大小 5,149,298 bytes，SHA-256 `D96435651B4F28812A088123786314315110E26E2BC5B2AF5B9ABE20B9767FD2`，与 GitHub digest 及本地下载复核一致。本仓库 Actions 仍无 workflow run。
 - 2026-09-17 v3.3.12 三网延迟：`vue-tsc --build` 通过；`git diff --check` 通过；本机 `http://localhost:5173/` 默认关闭时首页卡片仍只有延迟/丢包，无 `[data-three-net-ping]`。实时 `node.ping` 已写入 store。开启态需管理员在主题设置打开开关并选择最多 3 个任务后验证。`bun run lint` 因本机 Bun/Node 缺少 `Object.groupBy` 未作为通过证据。
 - 2026-07-14 v3.1.4 Issue #18 release：`bun run lint`、`bun run build`、`git diff --check` 通过；发布提交 `91c9b06` 已推送 `main`，Actions run `#29312369165`（#49）成功，tag / Release target 均为完整提交 `91c9b06fc5c4b5ee2636dc18779861186806abd7`，Issue #18 已关闭。线上 zip `komari-theme-Glassmorphism-build-91c9b06.zip` 大小 5,114,852 bytes，SHA-256 `f8b4c9b6f61cc66d755d7a612357d16d1d2774f9494b9b0c3ce87e572ee5da9b`，下载复核顶层结构 `komari-theme.json`、`preview.png`、`dist/`，包内版本 `3.1.4`。构建仍只有既有 `@vueuse/core` PURE 注释与 `globe` 大 chunk 警告。
 - 2026-07-14 v3.1.3 release：发布提交 `4f37416` 已推送 `main`；GitHub Actions run `#29311122789` 成功。Release `v3.1.3` 为正式发布（非 draft / prerelease），target 为完整提交 `4f3741692bd81141ed542614d5b31a01ff0dc0fc`，zip 资产 `komari-theme-Glassmorphism-build-4f37416.zip` 上传状态为 `uploaded`。下载复核：大小 5,120,783 bytes，SHA-256 `f4d5f1be0c769ffc5372ab6a9b780042768f82529827b7222a843ef642605bee`，顶层结构 `komari-theme.json`、`preview.png`、`dist/`，包内版本 `3.1.3`。
