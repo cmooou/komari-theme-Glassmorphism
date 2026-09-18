@@ -12,6 +12,20 @@
 
 ## 当前任务
 
+- 状态：done，v3.3.18 已通过 GitHub API 发布。
+- 内容：按服务器绑定 1～3 个三网 Ping 任务；未绑定节点继续用全局任务；保存时 `threeNetPingTaskIds` 写成 JSON 字符串，避免 Komari `pingtasks` 数组写回后清空已有三网。
+- 提交：`3e519a0` `feat: add per-server three-net ping bindings and release 3.3.18`，已推送 `main`。
+- Release：https://github.com/towersip/komari-theme-Glassmorphism/releases/tag/v3.3.18 正式发布，非 draft / prerelease；tag 指向 `3e519a0d38c8488c7e6206450ec8a8830499e06c`。
+- 资产：`komari-theme-Glassmorphism-build-3e519a0.zip`，5,143,047 bytes，SHA-256 `AA949B3A39F2E10620E1BE283CF4CC2D295A9EB38D0E0C235EE35C854F717C5A`；GitHub API digest 与下载后本地一致，包内版本 `3.3.18`，356 个条目，顶层 `komari-theme.json` / `preview.png` / `dist/`。
+- 验证：`vue-tsc --build` 与 `vite build` 通过；Node 22 下改动文件 ESLint 与 `git diff --check` 通过；zip 无 `admin-app`；本仓库 Actions 仍无 workflow run，因此未走 `Release On Version Bump`。
+- 不做：不 force-push；不给 `package.json` 加顶层 version。
+
+## 上一任务
+
+- 状态：done，v3.3.17 已通过 GitHub API 发布。
+
+## 上一任务
+
 - 状态：done，v3.3.17 已通过 GitHub API 发布。
 - 内容：离线节点卡片改为顶栏「离线」徽章 + 内容降饱和，去掉整卡毛玻璃遮罩；`auto` 背景方向只在进入或刷新时判断一次，页面内旋转不再重新加载背景。
 - 提交：`b11a46c` 运行时修复、`a4b07f9` 版本 bump、`38e9db2` README 发布说明，均已推送 `main`。
@@ -220,6 +234,12 @@
 - 不做：不把 Glassmorphism 默认主题替换混入计费 PR #604；不发布测试构建为正式 Release；不构建 Windows 包。
 
 ## 执行日志
+
+### 2026-09-18 v3.3.18 Release
+
+- README 当前版本与更新日志同步到 `v3.3.18`；提交 `3e519a0` 已推送 `main`。
+- 本地构建生成 `komari-theme-Glassmorphism-build-3e519a0.zip`；tag `v3.3.18` 指向该提交。
+- 因仓库 Actions 无 workflow run，使用 GitHub API 创建正式 Release 并上传 zip；下载复核 SHA-256、包内版本和顶层契约均通过。
 
 ### 2026-09-18 v3.3.17 Release
 
