@@ -54,7 +54,7 @@ https://github.com/towersip/komari-theme-Glassmorphism
 | :------- | :-------------------------------------------------------- |
 | 本仓库   | [towersip/komari-theme-Glassmorphism](https://github.com/towersip/komari-theme-Glassmorphism)，自己用，按需改 |
 | 原项目   | [sanrokamlan-prog/komari-theme-Glassmorphism](https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism) |
-| 当前版本 | **v3.3.15**                                               |
+| 当前版本 | **v3.3.17**                                               |
 | 主题定位 | Komari Monitor 可导入 zip 主题，不是普通 Web App 部署包   |
 | 视觉风格 | 毛玻璃卡片、动态背景、浅色 / 深色 / 北京时间自动日夜模式  |
 | 数据能力 | Metric Store 优先，旧接口自动 fallback，兼容 Komari 1.2.x |
@@ -62,6 +62,13 @@ https://github.com/towersip/komari-theme-Glassmorphism
 | 发布产物 | `komari-theme-Glassmorphism-build-<short-sha>.zip`        |
 
 > 按自己盯节点、Ping、流量、费用的习惯改，不是给所有人做的产品。
+
+---
+
+## 📴 v3.3.17 离线卡片与背景方向稳定
+
+- 离线节点卡片改为顶栏「离线」徽章，内容降饱和显示，不再用毛玻璃遮罩盖住整张卡
+- `auto` 背景方向只在进入或刷新页面时判断一次，同一页面内横竖屏切换不会重新加载背景
 
 ---
 
@@ -625,6 +632,14 @@ dist/
 ## 📝 更新日志
 
 <details open>
+<summary><strong>v3.3.17 · 离线卡片与背景方向稳定</strong></summary>
+
+- 离线节点卡片改为顶栏「离线」徽章 + 内容降饱和，去掉整卡毛玻璃遮罩
+- `auto` 背景方向只在进入或刷新时按当前视口选择一次，页面内旋转不再重新加载背景
+
+</details>
+
+<details>
 <summary><strong>v3.3.16 · 自适应横竖屏背景与多图地址</strong></summary>
 
 - 新增背景方向模式，可自动按视口选择横屏 / 竖屏，也可强制指定方向
@@ -634,7 +649,7 @@ dist/
 
 </details>
 
-<details open>
+<details>
 <summary><strong>v3.3.15 · 三网丢包对齐优化</strong></summary>
 
 - 收紧三网新版行布局，减少名称、延迟、Sparkline 和丢包之间的无效间距
