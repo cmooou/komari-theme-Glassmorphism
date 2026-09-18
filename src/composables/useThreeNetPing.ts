@@ -51,31 +51,37 @@ function ispShortLabel(value: string): string | undefined {
 
 const PING_TASK_SEPARATOR_RE = /[-_/|：:\s]+/
 const TRAILING_REGION_SUFFIX_RE = /[省市]$/
+const IP_VERSION_SUFFIX_RE = /(?:ipv|v)([46])\b/i
 
 function shortenPingTaskName(name: string, fallback: string): string {
   const trimmed = name.trim()
   if (!trimmed)
     return fallback
 
-  const parts = trimmed.split(PING_TASK_SEPARATOR_RE).map(part => part.trim()).filter(Boolean)
+  const ipVersionMatch = trimmed.match(IP_VERSION_SUFFIX_RE)
+  const ipVersion = ipVersionMatch ? `v${ipVersionMatch[1]}` : ''
+  const normalizedName = trimmed.replace(IP_VERSION_SUFFIX_RE, '').trim()
+  const parts = normalizedName.split(PING_TASK_SEPARATOR_RE).map(part => part.trim()).filter(Boolean)
+  const withIpVersion = (label: string) => `${label}${ipVersion}`
   if (parts.length >= 2) {
     const ispPart = parts.at(-1) ?? ''
     const isp = ispShortLabel(ispPart)
     if (isp) {
       const region = parts.slice(0, -1).join('').replace(TRAILING_REGION_SUFFIX_RE, '').trim()
-      return region ? `${region}${isp}` : isp
+      return withIpVersion(region ? `${region}${isp}` : isp)
     }
   }
 
-  const ispOnly = ispShortLabel(trimmed)
+  const ispOnly = ispShortLabel(normalizedName)
   if (ispOnly)
-    return ispOnly
+    return withIpVersion(ispOnly)
 
   const tail = parts.at(-1)
   if (tail && tail.length <= 6)
-    return tail
+    return withIpVersion(tail)
 
-  return trimmed.length > 6 ? `${trimmed.slice(0, 6)}…` : trimmed
+  const shortened = normalizedName.length > 6 ? `${normalizedName.slice(0, 6)}…` : normalizedName
+  return withIpVersion(shortened || fallback)
 }
 
 function readPingSample(ping: NodeData['ping'], taskId: number): NodeStatusPing | undefined {
@@ -92,7 +98,11 @@ function taskNameFromStats(metricStats: readonly PingMetricTaskStats[] | undefin
 export function useThreeNetPing(node: MaybeRefOrGetter<NodeData>, options: UseThreeNetPingOptions = {}) {
   const appStore = useAppStore()
 
-  const visible = computed(() => appStore.threeNetPingEnabled && appStore.threeNetPingTaskIds.length > 0)
+  const taskIds = computed(() => {
+    const binding = appStore.threeNetPingNodeTaskBindings[toValue(node).uuid]
+    return binding?.length ? [...binding] : [...appStore.threeNetPingTaskIds]
+  })
+  const visible = computed(() => appStore.threeNetPingEnabled && taskIds.value.length > 0)
 
   const historyItems = computed(() => {
     if (!visible.value)
@@ -103,7 +113,7 @@ export function useThreeNetPing(node: MaybeRefOrGetter<NodeData>, options: UseTh
     const metricLossPoints = toValue(options.metricLossPoints)
     const loading = toValue(options.loading) === true
 
-    return appStore.threeNetPingTaskIds.map((id) => {
+    return taskIds.value.map((id) => {
       const stats = buildPingStatsForTask(records, id, metricStats, metricLossPoints)
       const fullName = taskNameFromStats(metricStats, id) || `任务 ${id}`
       const emptyTooltip = loading ? '加载中' : `${fullName}\n暂无探测数据`

@@ -54,7 +54,7 @@ https://github.com/towersip/komari-theme-Glassmorphism
 | :------- | :-------------------------------------------------------- |
 | 本仓库   | [towersip/komari-theme-Glassmorphism](https://github.com/towersip/komari-theme-Glassmorphism)，自己用，按需改 |
 | 原项目   | [sanrokamlan-prog/komari-theme-Glassmorphism](https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism) |
-| 当前版本 | **v3.3.17**                                               |
+| 当前版本 | **v3.3.18**                                               |
 | 主题定位 | Komari Monitor 可导入 zip 主题，不是普通 Web App 部署包   |
 | 视觉风格 | 毛玻璃卡片、动态背景、浅色 / 深色 / 北京时间自动日夜模式  |
 | 数据能力 | Metric Store 优先，旧接口自动 fallback，兼容 Komari 1.2.x |
@@ -62,6 +62,15 @@ https://github.com/towersip/komari-theme-Glassmorphism
 | 发布产物 | `komari-theme-Glassmorphism-build-<short-sha>.zip`        |
 
 > 按自己盯节点、Ping、流量、费用的习惯改，不是给所有人做的产品。
+
+---
+
+## 🖥️ v3.3.18 按服务器配置三网任务
+
+- 管理员登录且开启「显示三网延迟」后，首页顶部会显示配置入口，可逐台服务器选择 1～3 个 Ping 任务
+- 未单独配置的服务器继续使用全局三网任务；配置页直接勾选任务名称和 ID，不必手写 JSON
+- 保存时按 Komari `pingtasks` 契约把全局任务写回 JSON 字符串，避免把已有三网任务清空
+- 任务名含 IPv4/IPv6 时，卡片短标签会保留 `v4` / `v6`；Sparkline 行用 subgrid 对齐名称列
 
 ---
 

@@ -2,7 +2,7 @@
   "name": "Komari Glassmorphism TS",
   "short": "GlassmorphismTS",
   "description": "A Glassmorphism theme for Komari",
-  "version": "3.3.17",
+  "version": "3.3.18",
   "author": "sanrokamlan",
   "url": "https://github.com/towersip/komari-theme-Glassmorphism",
   "preview": "preview.png",
@@ -58,6 +58,7 @@
       { "key": "threeNetPingEnabled", "name": "显示三网延迟", "type": "switch", "default": false, "help": "开启后，节点卡片上原来的一组延迟/丢包会换成所选 Ping 任务。默认仍用双栏方柱；若要名称 + 当前延迟 + Sparkline 折线 + 丢包率，再打开「三网新版样式」。" },
       { "key": "threeNetPingSparkline", "name": "三网新版样式", "type": "switch", "default": false, "help": "关闭时延迟/丢包沿用原来的双栏方柱。开启后改为名称、当前延迟、历史 Sparkline 折线和丢包率。未开三网时只影响卡片上的一组总览延迟/丢包。" },
       { "key": "threeNetPingTaskIds", "name": "三网延迟任务", "type": "pingtasks", "default": "[]", "help": "从延迟配置列表选择 1～3 个 Ping 任务，不必凑满 3 个。超过 3 个时只取前 3 个。未选任务时仍显示原来的一组总览延迟/丢包。" },
+      { "key": "threeNetPingNodeTaskBindings", "name": "按服务器 Ping 任务", "type": "richtext", "default": "{}", "help": "由首页顶部「按服务器配置 Ping 任务」维护，一般不用手改。保存在主题设置里，避免后台保存其他选项时丢失按服务器绑定。" },
 
       { "name": "06 · 节点详情概览卡片", "type": "title" },
       { "key": "nodeDetailSectionTabsEnabled", "name": "详情页分区标签页", "type": "switch", "default": false, "help": "默认关闭，保持节点详情页纵向连续展示；开启后按概览、负载、延迟分区显示。" },

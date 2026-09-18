@@ -365,22 +365,22 @@ export class KomariApi {
       clearTimeout(timeoutId)
 
       const result = await safeJson(response)
-      if (!result || typeof result !== 'object')
-        throw new ApiError(response.ok ? 'Invalid API response' : `HTTP error: ${response.status}`, 'error', response.status)
-
-      // 登录接口返回 set-cookie 特殊结构
-      if ('set-cookie' in result) {
-        return result as T
+      if (result && typeof result === 'object') {
+        const responseStatus = (result as Record<string, unknown>).status
+        if (responseStatus === 'error') {
+          const message = (result as Record<string, unknown>).message
+          throw new ApiError(typeof message === 'string' && message ? message : 'Unknown error', 'error', response.status)
+        }
       }
 
-      // 检查 API 响应状态
-      if (!isApiResponse<T>(result))
-        throw new ApiError(response.ok ? 'Invalid API response' : `HTTP error: ${response.status}`, 'error', response.status)
-      if (result.status === 'error') {
-        throw new ApiError(result.message || 'Unknown error', 'error', response.status)
-      }
+      if (isApiResponse<T>(result))
+        return result.data
 
-      return result.data
+      // 主题设置保存成功时，部分 Komari 版本返回空 body 或不带 data 的简化响应。
+      if (response.ok)
+        return undefined as T
+
+      throw new ApiError(`HTTP error: ${response.status}`, 'error', response.status)
     }
     catch (error) {
       clearTimeout(timeoutId)
@@ -410,6 +410,13 @@ export class KomariApi {
    */
   async getPublicSettings(): Promise<PublicSettings> {
     return this.get<PublicSettings>('/public')
+  }
+
+  /**
+   * 保存主题托管配置。
+   */
+  async saveThemeSettings(theme: string, settings: Record<string, unknown>, signal?: AbortSignal): Promise<void> {
+    await this.post<unknown>(`/admin/theme/settings?theme=${encodeURIComponent(theme)}`, settings, signal)
   }
 
   /**

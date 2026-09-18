@@ -43,6 +43,18 @@ const actionButtons = computed(() => {
     })
   }
 
+  if (
+    router.currentRoute.value.name === 'home'
+    && appStore.privateFeaturesAllowed
+    && appStore.threeNetPingEnabled
+  ) {
+    buttons.push({
+      title: '按服务器配置 Ping 任务',
+      icon: 'tabler:server-cog',
+      action: 'openThreeNetPingSettings',
+    })
+  }
+
   buttons.push({
     title: `${themeTitleMap[appStore.themeMode]}（点击切换）`,
     icon: themeIconMap[appStore.themeMode],
@@ -72,6 +84,9 @@ function handleButtonClick(action: string) {
       break
     case 'toggleHomeTools':
       appStore.homeAdvancedToolsVisible = !appStore.homeAdvancedToolsVisible
+      break
+    case 'openThreeNetPingSettings':
+      void router.push({ name: 'theme-ping-settings' })
       break
     case 'jumpToSetting':
       void recordVisitorEvent({

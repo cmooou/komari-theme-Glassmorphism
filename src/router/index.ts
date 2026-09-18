@@ -13,6 +13,11 @@ const router = createRouter({
       name: 'instance-detail',
       component: () => import('@/views/InstanceDetail.vue'),
     },
+    {
+      path: '/theme-settings/ping',
+      name: 'theme-ping-settings',
+      component: () => import('@/views/ThemePingSettings.vue'),
+    },
   ],
 })
 

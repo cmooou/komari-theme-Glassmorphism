@@ -534,15 +534,14 @@ function hasRegion(region: string | null | undefined): boolean {
         <!-- 延迟 + 丢包：默认总览一行；开启三网后每条线路一行。新版 Sparkline 由 threeNetPingSparkline 控制。 -->
         <div
           :data-three-net-ping="threeNetPingVisible ? '' : undefined"
-          class="flex flex-col"
-          :class="[pingSparklineStyle ? 'gap-1' : 'gap-1.5', pingSparklineStyle && !props.node.online && 'opacity-50']"
+          :class="[pingSparklineStyle ? 'ping-sparkline-list gap-y-1' : 'flex flex-col gap-1.5', pingSparklineStyle && !props.node.online && 'opacity-50']"
         >
           <template v-if="pingSparklineStyle">
             <button
               v-for="row in pingPanelRows"
               :key="row.key"
               type="button"
-              class="ping-sparkline-row group/ping grid min-h-5 min-w-0 grid-cols-[auto_minmax(0,max-content)_max-content_minmax(3.5rem,1fr)_max-content] items-center gap-x-1 rounded-md px-0.5 text-left leading-none hover:bg-slate-500/5"
+              class="ping-sparkline-row group/ping min-h-5 min-w-0 items-center rounded-md px-0.5 text-left leading-none hover:bg-slate-500/5"
               :title="`${row.latencyTooltip}\n${row.lossTooltip}`"
               :aria-label="row.ariaLabel"
               @click.stop="emit('pingClick')"
@@ -695,9 +694,19 @@ function hasRegion(region: string | null | undefined): boolean {
   filter: saturate(0.55);
 }
 
+.ping-sparkline-list {
+  display: grid;
+  grid-template-columns: auto minmax(0, max-content) max-content minmax(3.5rem, 1fr) max-content;
+  column-gap: 0.25rem;
+}
+
 .ping-sparkline-row {
-  /* Keep labels compact and give the line the remaining width. */
+  display: grid;
+  grid-column: 1 / -1;
   min-width: 0;
+  column-gap: inherit;
+  grid-template-columns: auto minmax(0, max-content) max-content minmax(3.5rem, 1fr) max-content;
+  grid-template-columns: subgrid;
 }
 
 .ping-loss-cell {
@@ -705,9 +714,13 @@ function hasRegion(region: string | null | undefined): boolean {
 }
 
 @media (max-width: 420px) {
+  .ping-sparkline-list,
   .ping-sparkline-row {
-    column-gap: 0.25rem;
     grid-template-columns: auto minmax(0, max-content) max-content minmax(3rem, 1fr) max-content;
+  }
+
+  .ping-sparkline-row {
+    grid-template-columns: subgrid;
   }
 
   .ping-loss-cell {

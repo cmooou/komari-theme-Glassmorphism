@@ -835,6 +835,37 @@ function parsePingTaskIds(raw: unknown, max = THREE_NET_PING_TASK_LIMIT): number
   return ids
 }
 
+function parseThreeNetPingNodeTaskBindings(raw: unknown): Record<string, number[]> {
+  let value: unknown = raw
+  if (typeof value === 'string') {
+    const trimmed = value.trim()
+    if (!trimmed)
+      return {}
+    try {
+      value = JSON.parse(trimmed) as unknown
+    }
+    catch {
+      return {}
+    }
+  }
+
+  if (!value || typeof value !== 'object' || Array.isArray(value))
+    return {}
+
+  const bindings: Record<string, number[]> = {}
+  for (const [nodeKey, rawBinding] of Object.entries(value)) {
+    const normalizedNodeKey = nodeKey.trim()
+    if (!normalizedNodeKey)
+      continue
+
+    const taskIds = parsePingTaskIds(rawBinding)
+    if (taskIds.length > 0)
+      bindings[normalizedNodeKey] = taskIds
+  }
+
+  return bindings
+}
+
 function resolveBackgroundSource(value: unknown): string {
   if (typeof value !== 'string')
     return ''
@@ -1231,6 +1262,16 @@ const useAppStore = defineStore('app', () => {
 
   const threeNetPingTaskIds = computed<number[]>(() => parsePingTaskIds(themeSettings.value.threeNetPingTaskIds))
 
+  const threeNetPingNodeTaskBindings = computed<Record<string, number[]>>(() => parseThreeNetPingNodeTaskBindings(themeSettings.value.threeNetPingNodeTaskBindings))
+
+  const threeNetPingMaxTaskCount = computed<number>(() => {
+    let maxCount = threeNetPingTaskIds.value.length
+    for (const binding of Object.values(threeNetPingNodeTaskBindings.value)) {
+      maxCount = Math.max(maxCount, binding.length)
+    }
+    return maxCount
+  })
+
   const chartDashboardTemplate = computed<ChartDashboardTemplate>(() => {
     const settings = themeSettings.value
 
@@ -1465,6 +1506,8 @@ const useAppStore = defineStore('app', () => {
     threeNetPingEnabled,
     threeNetPingSparkline,
     threeNetPingTaskIds,
+    threeNetPingNodeTaskBindings,
+    threeNetPingMaxTaskCount,
     chartDashboardTemplate,
     hideAdminEntryWhenLoggedOut,
     hidePriceWhenLoggedOut,

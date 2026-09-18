@@ -270,9 +270,9 @@ const deferredNodeCardHeight = computed(() => {
   const baseHeight = sparkline
     ? { mini: 200, compact: 248, comfortable: 288, large: 328 }[appStore.nodeCardSize]
     : { mini: 220, compact: 270, comfortable: 310, large: 350 }[appStore.nodeCardSize]
-  if (!appStore.threeNetPingEnabled || appStore.threeNetPingTaskIds.length === 0)
+  if (!appStore.threeNetPingEnabled || appStore.threeNetPingMaxTaskCount === 0)
     return baseHeight
-  const extraRows = Math.max(0, appStore.threeNetPingTaskIds.length - 1)
+  const extraRows = Math.max(0, appStore.threeNetPingMaxTaskCount - 1)
   const rowHeight = sparkline
     ? { mini: 22, compact: 24, comfortable: 26, large: 28 }[appStore.nodeCardSize]
     : { mini: 36, compact: 50, comfortable: 54, large: 62 }[appStore.nodeCardSize]
