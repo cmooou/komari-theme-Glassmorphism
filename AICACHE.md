@@ -12,10 +12,16 @@
 
 ## 当前任务
 
-- 状态：in_progress，把官方已归档的 Komari 主程序 / Agent 迁到 `towersip` 个人维护仓。
-- 内容：fork `komari`、`komari-agent`，并同时 fork 后台前端 `komari-web`；安装脚本、自动更新、管理端生成的 Agent 命令改指向 `towersip`；主题页脚和文档改为这套仓库。
+- 状态：done，官方 Komari 主程序 / Agent 已迁到 `towersip` 个人维护仓。
 - 仓库：https://github.com/towersip/komari 、https://github.com/towersip/komari-agent 、https://github.com/towersip/komari-web
-- 不做：不改 Go module path；不 bump 主题版本；不 force-push。
+- 提交：`komari` `cc7e7b7`、`komari-agent` `00e0620`、`komari-web` `7d44921`、主题文档 `f4d3ddf`，均已推送。
+- Release 镜像：`towersip/komari` `1.5.0-fix1`、`towersip/komari-agent` `1.5.11` 已从官方最新稳定包复制资产，安装脚本可先用。
+- 验证：三个 fork 已存在；安装/自动更新/管理端 Agent 命令已改指向 `towersip`；主题页脚改为 `towersip/komari`。
+- 不做：不改 Go module path；不 bump 主题版本；不在本轮自建新二进制；未发布 Docker 到 `ghcr.io/towersip/*`。
+
+## 上一任务
+
+- 状态：done，v3.3.18 已通过 GitHub API 发布。
 
 ## 上一任务
 
