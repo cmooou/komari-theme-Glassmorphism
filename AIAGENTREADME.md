@@ -24,8 +24,11 @@
 | 角色 | 地址 |
 | --- | --- |
 | 本仓库 | https://github.com/towersip/komari-theme-Glassmorphism |
-| 原项目（fork 来源） | https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism |
+| 原项目（fork 来源，已停更） | https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism |
 | 原始主题作者 / 基座 | [Tokinx](https://github.com/Tokinx) / [komari-theme-emerald](https://github.com/Tokinx/komari-theme-emerald) |
+| 监控主程序（个人维护） | https://github.com/towersip/komari |
+| 采集端（个人维护） | https://github.com/towersip/komari-agent |
+| 管理端前端（个人维护） | https://github.com/towersip/komari-web |
 
 关键事实：
 

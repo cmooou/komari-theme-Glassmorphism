@@ -19,6 +19,7 @@ Personal-use fork. Change it to fit this repo owner's needs; do not treat it as 
 
 - This repo: https://github.com/towersip/komari-theme-Glassmorphism
 - Origin: https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism
+- Personal Komari stack: https://github.com/towersip/komari , https://github.com/towersip/komari-agent , https://github.com/towersip/komari-web
 - Original author / base: https://github.com/Tokinx/komari-theme-emerald
 
 Key release facts:

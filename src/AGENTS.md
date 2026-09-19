@@ -2,7 +2,7 @@
 
 This guide applies to [src/](./). For full project context, read [../AIAGENTREADME.md](../AIAGENTREADME.md). For current work handoff, read/update [../AICACHE.md](../AICACHE.md).
 
-This source tree is the personal-use fork [towersip/komari-theme-Glassmorphism](https://github.com/towersip/komari-theme-Glassmorphism). Origin: [sanrokamlan-prog/komari-theme-Glassmorphism](https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism). Do not default-sync upstream.
+This source tree is the personal-use fork [towersip/komari-theme-Glassmorphism](https://github.com/towersip/komari-theme-Glassmorphism). Origin: [sanrokamlan-prog/komari-theme-Glassmorphism](https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism) (unmaintained). Runtime backend/agent/admin frontend: [towersip/komari](https://github.com/towersip/komari), [towersip/komari-agent](https://github.com/towersip/komari-agent), [towersip/komari-web](https://github.com/towersip/komari-web). Do not default-sync upstream.
 
 ## Source-tree rule of thumb
 

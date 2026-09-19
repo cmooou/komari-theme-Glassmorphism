@@ -53,7 +53,10 @@ https://github.com/towersip/komari-theme-Glassmorphism
 | 项目     | 说明                                                      |
 | :------- | :-------------------------------------------------------- |
 | 本仓库   | [towersip/komari-theme-Glassmorphism](https://github.com/towersip/komari-theme-Glassmorphism)，自己用，按需改 |
-| 原项目   | [sanrokamlan-prog/komari-theme-Glassmorphism](https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism) |
+| 原项目   | [sanrokamlan-prog/komari-theme-Glassmorphism](https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism)，已停更，只作历史来源 |
+| 监控主程序 | [towersip/komari](https://github.com/towersip/komari)，官方 `komari-monitor/komari` 已归档后的个人维护仓 |
+| 采集端   | [towersip/komari-agent](https://github.com/towersip/komari-agent) |
+| 管理端前端 | [towersip/komari-web](https://github.com/towersip/komari-web)，打进主程序的后台 / 默认主题 |
 | 当前版本 | **v3.3.18**                                               |
 | 主题定位 | Komari Monitor 可导入 zip 主题，不是普通 Web App 部署包   |
 | 视觉风格 | 毛玻璃卡片、动态背景、浅色 / 深色 / 北京时间自动日夜模式  |
@@ -931,7 +934,13 @@ dist/
 - 🍴 需要自己改就 fork 走
 - 💬 Issue 可以丢这边
 
-通用版本请看 [原项目](https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism)。
+通用版本请看本仓库自己的 Release，不要再跟已停更的 [原主题项目](https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism)。
+
+线上主程序和 Agent 用个人维护仓：
+
+- [towersip/komari](https://github.com/towersip/komari)
+- [towersip/komari-agent](https://github.com/towersip/komari-agent)
+- [towersip/komari-web](https://github.com/towersip/komari-web)
 
 ---
 
@@ -945,7 +954,7 @@ dist/
 
 ## 🙏 致谢
 
-fork 自 [原项目](https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism)，给自己用。毛玻璃基座是 [Tokinx](https://github.com/Tokinx) 的 [emerald](https://github.com/Tokinx/komari-theme-emerald)。也谢谢 [Komari](https://github.com/komari-monitor/komari)、[Komari Naive](https://github.com/tonyliuzj/komari-naive)、Vue、Vite、reka-ui、Tailwind CSS。
+fork 自 [原项目](https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism)，给自己用。毛玻璃基座是 [Tokinx](https://github.com/Tokinx) 的 [emerald](https://github.com/Tokinx/komari-theme-emerald)。主程序和 Agent 已改到个人维护仓 [komari](https://github.com/towersip/komari)、[komari-agent](https://github.com/towersip/komari-agent)、[komari-web](https://github.com/towersip/komari-web)。也谢谢 [Komari](https://github.com/komari-monitor/komari)、[Komari Naive](https://github.com/tonyliuzj/komari-naive)、Vue、Vite、reka-ui、Tailwind CSS。
 
 ## 📄 License
 

@@ -9,7 +9,8 @@ For the complete AI/developer manual, read [AIAGENTREADME.md](AIAGENTREADME.md).
 - Updated: 2026-09-17
 - Branch: `main`
 - Repo: [towersip/komari-theme-Glassmorphism](https://github.com/towersip/komari-theme-Glassmorphism) — personal-use fork, change for own needs
-- Upstream origin: [sanrokamlan-prog/komari-theme-Glassmorphism](https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism)
+- Upstream origin: [sanrokamlan-prog/komari-theme-Glassmorphism](https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism) — unmaintained, history only
+- Personal Komari stack: [towersip/komari](https://github.com/towersip/komari), [towersip/komari-agent](https://github.com/towersip/komari-agent), [towersip/komari-web](https://github.com/towersip/komari-web)
 - Original theme author / base: [Tokinx/komari-theme-emerald](https://github.com/Tokinx/komari-theme-emerald)
 - App: Vue 3 + Vite + reka-ui + Tailwind CSS v4 theme for Komari Monitor
 - Package manager: `bun` >= 1.2

@@ -12,6 +12,13 @@
 
 ## 当前任务
 
+- 状态：in_progress，把官方已归档的 Komari 主程序 / Agent 迁到 `towersip` 个人维护仓。
+- 内容：fork `komari`、`komari-agent`，并同时 fork 后台前端 `komari-web`；安装脚本、自动更新、管理端生成的 Agent 命令改指向 `towersip`；主题页脚和文档改为这套仓库。
+- 仓库：https://github.com/towersip/komari 、https://github.com/towersip/komari-agent 、https://github.com/towersip/komari-web
+- 不做：不改 Go module path；不 bump 主题版本；不 force-push。
+
+## 上一任务
+
 - 状态：done，v3.3.18 已通过 GitHub API 发布。
 - 内容：按服务器绑定 1～3 个三网 Ping 任务；未绑定节点继续用全局任务；保存时 `threeNetPingTaskIds` 写成 JSON 字符串，避免 Komari `pingtasks` 数组写回后清空已有三网。
 - 提交：`3e519a0` `feat: add per-server three-net ping bindings and release 3.3.18`，已推送 `main`。
